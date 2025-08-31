@@ -1,5 +1,9 @@
 # 🛡️ FlowTravel Insurance dApp
 
+
+<img width="1568" height="238" alt="Screenshot 2025-08-31 234134" src="https://github.com/user-attachments/assets/2a608342-1e1f-4773-bba5-0d4ec3835432" />
+
+
 *A comprehensive decentralized travel insurance platform built on Flow blockchain*
 
 [![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/apna-codings-projects/v0-travel-insurance-d-app)
@@ -278,16 +282,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Discord**: [Flow Discord Community](https://discord.gg/flow)
 - **Issues**: [GitHub Issues](https://github.com/your-username/flowtravel-insurance/issues)
 
-## 🚀 Deployment
 
-Your project is live at:
-
-**[https://vercel.com/apna-codings-projects/v0-travel-insurance-d-app](https://vercel.com/apna-codings-projects/v0-travel-insurance-d-app)**
-
-Continue building your app on:
-
-**[https://v0.app/chat/projects/X4LnV9m82Vi](https://v0.app/chat/projects/X4LnV9m82Vi)**
-
----
-
-Built with ❤️ using [v0.app](https://v0.app) and Flow blockchain technology.
