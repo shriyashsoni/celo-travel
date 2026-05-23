@@ -32,7 +32,8 @@ export default function AgentDashboardPage() {
   const { address, isConnected } = useAccount();
   
   // Auth State
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [passwordInput, setPasswordInput] = useState("");
   const [authError, setAuthError] = useState("");
 
@@ -50,6 +51,20 @@ export default function AgentDashboardPage() {
   const [loadingHistory, setLoadingHistory] = useState(true);
   
   useEffect(() => setMounted(true), []);
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      if (window.location.hash === "#admin") {
+        setShowPasswordModal(true);
+      } else {
+        setShowPasswordModal(false);
+      }
+    };
+    
+    handleHashChange();
+    window.addEventListener("hashchange", handleHashChange);
+    return () => window.removeEventListener("hashchange", handleHashChange);
+  }, []);
 
   const { writeContract, isPending, isSuccess } = useWriteContract();
   
@@ -81,7 +96,6 @@ export default function AgentDashboardPage() {
 
   // Fetch CeloScan History
   useEffect(() => {
-    if (!isAuthenticated) return;
     const fetchHistory = async () => {
       try {
         setLoadingHistory(true);
@@ -121,7 +135,7 @@ export default function AgentDashboardPage() {
     fetchHistory();
     const interval = setInterval(fetchHistory, 15000); 
     return () => clearInterval(interval);
-  }, [isAuthenticated]);
+  }, []);
 
   const timeAgo = (timestamp: string) => {
     const seconds = Math.floor((new Date().getTime() / 1000) - Number(timestamp));
@@ -155,44 +169,16 @@ export default function AgentDashboardPage() {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     if (passwordInput === "Soni#2023") {
-      setIsAuthenticated(true);
+      setIsAdmin(true);
       setAuthError("");
+      setShowPasswordModal(false);
+      window.location.hash = "";
     } else {
       setAuthError("Incorrect password. Access denied.");
     }
   };
 
   if (!mounted) return null;
-
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-black text-white font-body">
-        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="liquid-glass p-8 rounded-3xl max-w-md w-full border border-white/10 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/10 rounded-full blur-3xl"></div>
-          <div className="flex flex-col items-center mb-8 relative z-10">
-            <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4 border border-white/10">
-              <ShieldCheck className="text-green-400" size={32} />
-            </div>
-            <h1 className="text-3xl font-heading italic">Admin Portal</h1>
-            <p className="text-white/50 text-sm mt-2 text-center">Restricted access. Enter administrator password to view on-chain metrics and analytics.</p>
-          </div>
-          <form onSubmit={handleLogin} className="flex flex-col gap-4 relative z-10">
-            <input 
-              type="password" 
-              placeholder="Enter Password" 
-              className="bg-black/50 border border-white/10 rounded-xl px-4 py-4 text-white focus:outline-none focus:border-green-400 focus:ring-1 focus:ring-green-400 transition-all text-center tracking-widest"
-              value={passwordInput}
-              onChange={(e) => setPasswordInput(e.target.value)}
-            />
-            {authError && <p className="text-red-400 text-sm text-center">{authError}</p>}
-            <button type="submit" className="w-full bg-white text-black font-medium py-4 rounded-xl hover:bg-green-400 transition-all mt-2">
-              Authenticate
-            </button>
-          </form>
-        </motion.div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen flex flex-col bg-black text-white font-body overflow-x-hidden">
@@ -207,9 +193,22 @@ export default function AgentDashboardPage() {
             </p>
           </div>
           <div className="flex flex-col items-end gap-3">
-            <div className="flex items-center gap-3 px-6 py-4 liquid-glass rounded-full border border-green-500/30 shadow-[0_0_20px_rgba(34,197,94,0.2)]">
-              <div className="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse"></div>
-              <span className="font-medium text-sm text-green-400">Agent Network: Live</span>
+            <div className="flex items-center gap-3">
+              {isAdmin ? (
+                <div className="flex items-center gap-2 px-4 py-2 liquid-glass rounded-full border border-green-500/30 text-green-400 text-xs font-semibold uppercase tracking-wider">
+                  <ShieldCheck size={14} />
+                  <span>Admin Mode Active</span>
+                </div>
+              ) : (
+                <a href="#admin" className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 transition-all rounded-full border border-white/10 text-white/70 text-xs font-semibold uppercase tracking-wider">
+                  <ShieldCheck size={14} className="text-white/50" />
+                  <span>Authorize Admin</span>
+                </a>
+              )}
+              <div className="flex items-center gap-3 px-6 py-4 liquid-glass rounded-full border border-green-500/30 shadow-[0_0_20px_rgba(34,197,94,0.2)]">
+                <div className="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse"></div>
+                <span className="font-medium text-sm text-green-400">Agent Network: Live</span>
+              </div>
             </div>
             {blockNumber && (
               <span className="text-xs text-white/40 font-mono">Current Block: {blockNumber.toString()}</span>
@@ -261,6 +260,18 @@ export default function AgentDashboardPage() {
           
           {/* Admin Mint Panel */}
           <motion.div custom={7} initial="hidden" animate="visible" variants={fadeUp} className="liquid-glass rounded-3xl p-8 relative overflow-hidden flex flex-col border border-yellow-500/20 lg:col-span-1">
+            {!isAdmin && (
+              <div className="absolute inset-0 z-20 bg-black/70 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center">
+                <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-4 border border-white/10">
+                  <ShieldCheck className="text-yellow-400" size={24} />
+                </div>
+                <h3 className="font-heading italic text-lg text-white mb-2">Policy Creator Locked</h3>
+                <p className="text-white/50 text-xs mb-6 max-w-[200px]">Administrator authorization is required to manually issue policies.</p>
+                <a href="#admin" className="px-5 py-2.5 bg-white hover:bg-yellow-400 hover:text-black text-black text-xs font-semibold rounded-full transition-all">
+                  Unlock Creator
+                </a>
+              </div>
+            )}
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-400 to-yellow-600"></div>
             <div className="flex items-center justify-between mb-8 pb-6 border-b border-white/10">
               <div>
@@ -447,8 +458,51 @@ export default function AgentDashboardPage() {
             </div>
           </motion.div>
         </div>
-
       </main>
+
+      {showPasswordModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md">
+          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="liquid-glass p-8 rounded-3xl max-w-md w-full border border-white/10 relative overflow-hidden mx-4">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/10 rounded-full blur-3xl"></div>
+            <div className="flex flex-col items-center mb-8 relative z-10">
+              <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4 border border-white/10">
+                <ShieldCheck className="text-green-400" size={32} />
+              </div>
+              <h1 className="text-3xl font-heading italic text-white">Admin Access</h1>
+              <p className="text-white/50 text-xs mt-2 text-center">Restricted area. Enter administrator password to activate manual policy creation controls.</p>
+            </div>
+            <form onSubmit={handleLogin} className="flex flex-col gap-4 relative z-10">
+              <input 
+                type="password" 
+                placeholder="Enter Password" 
+                className="bg-black/50 border border-white/10 rounded-xl px-4 py-4 text-white focus:outline-none focus:border-green-400 focus:ring-1 focus:ring-green-400 transition-all text-center tracking-widest"
+                value={passwordInput}
+                onChange={(e) => setPasswordInput(e.target.value)}
+                autoFocus
+              />
+              {authError && <p className="text-red-400 text-sm text-center">{authError}</p>}
+              <div className="flex gap-3 mt-2">
+                <button 
+                  type="button" 
+                  onClick={() => {
+                    setShowPasswordModal(false);
+                    window.location.hash = "";
+                  }}
+                  className="flex-1 bg-white/5 border border-white/10 text-white font-medium py-3 rounded-xl hover:bg-white/10 transition-all text-sm"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit" 
+                  className="flex-1 bg-white text-black font-medium py-3 rounded-xl hover:bg-green-400 transition-all text-sm"
+                >
+                  Authenticate
+                </button>
+              </div>
+            </form>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }
