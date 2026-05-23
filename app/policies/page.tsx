@@ -7,7 +7,7 @@ import { useAccount, useReadContract } from "wagmi";
 import { parseAbi } from "viem";
 import Link from "next/link";
 
-const POLICY_NFT_ADDRESS = process.env.NEXT_PUBLIC_POLICY_NFT_ADDRESS as `0x${string}` || "0x4a2198F52f2E57047F21116Ed6Bb242600D8ce72";
+const POLICY_NFT_ADDRESS = process.env.NEXT_PUBLIC_POLICY_NFT_ADDRESS as `0x${string}` || "0x48Bd564c86e379D08D5b536c766b65b966548Ab1";
 
 const abi = parseAbi([
   'function balanceOf(address owner) external view returns (uint256)',

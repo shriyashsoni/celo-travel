@@ -6,8 +6,8 @@ import { Plane, Shield, ShieldCheck, Activity, CheckCircle } from "lucide-react"
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt, useChainId, useSwitchChain } from "wagmi";
 import { parseAbi, parseUnits } from "viem";
 
-const INSURANCE_POOL_ADDRESS = process.env.NEXT_PUBLIC_INSURANCE_POOL_ADDRESS as `0x${string}` || "0x59575D99d6691d109651C5bF357d78851dF90edB";
-const CUSD_ADDRESS = "0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1"; // Sepolia cUSD
+const INSURANCE_POOL_ADDRESS = process.env.NEXT_PUBLIC_INSURANCE_POOL_ADDRESS as `0x${string}` || "0x78bf048E450Ec94cB055C8ab180CA27c912e975e";
+const CUSD_ADDRESS = "0x954cBA141f21760751E3065ACC250c38fb9f5e61"; // Sepolia cUSD
 
 const erc20Abi = parseAbi([
   'function allowance(address owner, address spender) view returns (uint256)',
@@ -65,11 +65,17 @@ export default function BuyPolicyPage() {
 
   const needsApproval = isCorrectChain && !isApprovedLocal && (allowance === undefined || (allowance as bigint) < premiumInWei);
 
-  const { writeContract, data: txHash, isPending } = useWriteContract();
+  const { writeContract, data: txHash, isPending, error } = useWriteContract();
 
   const { isLoading: isTxConfirming, isSuccess: isTxSuccess } = useWaitForTransactionReceipt({
     hash: txHash,
   });
+
+  useEffect(() => {
+    if (error) {
+      setTxType('idle');
+    }
+  }, [error]);
 
   useEffect(() => {
     if (isTxSuccess) {

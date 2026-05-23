@@ -38,15 +38,15 @@ async function main() {
   const agentRegistryAddress = await agentRegistry.getAddress();
   console.log("AgentRegistry deployed to:", agentRegistryAddress);
 
-  // cUSD address on Alfajores Testnet
-  const cUSD_ALFAJORES = "0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1";
+  // cUSD address on Celo Sepolia Testnet
+  const cUSD_SEPOLIA = "0x954cBA141f21760751E3065ACC250c38fb9f5e61";
   const agentWallet = wallet.address; 
 
   // 3. Deploy InsurancePool
   console.log("Deploying InsurancePool...");
   const poolArtifact = readArtifact("InsurancePool");
   const PoolFactory = new ethers.ContractFactory(poolArtifact.abi, poolArtifact.bytecode, wallet);
-  const insurancePool = await PoolFactory.deploy(cUSD_ALFAJORES, policyNFTAddress, agentWallet);
+  const insurancePool = await PoolFactory.deploy(cUSD_SEPOLIA, policyNFTAddress, agentWallet);
   await insurancePool.waitForDeployment();
   const insurancePoolAddress = await insurancePool.getAddress();
   console.log("InsurancePool deployed to:", insurancePoolAddress);
