@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Plane, Shield, ShieldCheck, Activity, CheckCircle } from "lucide-react";
-import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
+import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt, useChainId, useSwitchChain } from "wagmi";
 import { parseAbi, parseUnits } from "viem";
 
 const INSURANCE_POOL_ADDRESS = process.env.NEXT_PUBLIC_INSURANCE_POOL_ADDRESS as `0x${string}` || "0x59575D99d6691d109651C5bF357d78851dF90edB";
@@ -32,6 +32,10 @@ export default function BuyPolicyPage() {
   useEffect(() => setMounted(true), []);
 
   const { address, isConnected } = useAccount();
+  const chainId = useChainId();
+  const { switchChain } = useSwitchChain();
+  const isCorrectChain = chainId === 44787; // Celo Alfajores Testnet ID
+  
   const [flightNumber, setFlightNumber] = useState("");
   const [date, setDate] = useState("");
   const [selectedTier, setSelectedTier] = useState<number | null>(null);
@@ -45,16 +49,16 @@ export default function BuyPolicyPage() {
   const selectedPremium = selectedTier ? tiers.find(t => t.id === selectedTier)?.premiumValue : "0";
   const premiumInWei = parseUnits(selectedPremium || "0", 18);
 
-  // Read Allowance
+  // Read Allowance (only if correct chain is active)
   const { data: allowance, refetch: refetchAllowance } = useReadContract({
     address: CUSD_ADDRESS,
     abi: erc20Abi,
     functionName: 'allowance',
     args: [address as `0x${string}`, INSURANCE_POOL_ADDRESS],
-    query: { enabled: !!address },
+    query: { enabled: !!address && isCorrectChain },
   });
 
-  const needsApproval = allowance === undefined || (allowance as bigint) < premiumInWei;
+  const needsApproval = isCorrectChain && (allowance === undefined || (allowance as bigint) < premiumInWei);
 
   const { writeContract, data: txHash, isPending } = useWriteContract();
 
@@ -69,7 +73,14 @@ export default function BuyPolicyPage() {
   }, [isTxSuccess, refetchAllowance]);
 
   const handleTransaction = () => {
-    if (!isConnected || !flightNumber || !date || !selectedTier) return;
+    if (!isConnected) return;
+    
+    if (!isCorrectChain) {
+      switchChain({ chainId: 44787 });
+      return;
+    }
+
+    if (!flightNumber || !date || !selectedTier) return;
 
     if (needsApproval) {
       writeContract({
@@ -206,13 +217,17 @@ export default function BuyPolicyPage() {
               
               <button 
                 onClick={handleTransaction}
-                disabled={!flightNumber || !date || !selectedTier || isPending || isTxConfirming || !isConnected}
+                disabled={(isConnected && isCorrectChain && (!flightNumber || !date || !selectedTier)) || isPending || isTxConfirming}
                 className={`w-full py-4 rounded-full font-medium text-black transition-all flex items-center justify-center gap-2 ${
+                  !isConnected ? "bg-white hover:bg-white/90" : 
+                  !isCorrectChain ? "bg-red-500 hover:bg-red-400 text-white shadow-[0_0_15px_rgba(239,68,68,0.4)]" :
                   needsApproval ? "bg-yellow-400 hover:bg-yellow-300" : "bg-white hover:bg-white/90"
                 } disabled:opacity-50 disabled:cursor-not-allowed`}
               >
                 {!isConnected ? (
                   "Connect Wallet to Buy"
+                ) : !isCorrectChain ? (
+                  "Switch to Alfajores Testnet"
                 ) : isPending || isTxConfirming ? (
                   <>
                     <Activity className="animate-spin" size={18} />
@@ -230,8 +245,12 @@ export default function BuyPolicyPage() {
                 )}
               </button>
 
-              <div className="mt-4 flex items-center justify-center gap-2 text-xs text-white/40">
-                {needsApproval ? (
+              <div className="mt-4 flex items-center justify-center gap-2 text-xs">
+                {!isConnected ? (
+                  <span className="text-white/40">Connect your Web3 wallet to begin</span>
+                ) : !isCorrectChain ? (
+                  <span className="text-red-400 font-medium">Wrong Network: MetaMask must be on Celo Alfajores</span>
+                ) : needsApproval ? (
                   <span className="text-yellow-400/80">Step 1: Approve Token Spend</span>
                 ) : (
                   <span className="text-green-400/80">Step 2: Mint Policy NFT</span>
