@@ -1,43 +1,51 @@
-require("@nomicfoundation/hardhat-toolbox")
-require("dotenv").config()
+import "@nomicfoundation/hardhat-ethers";
+import * as dotenv from "dotenv";
+dotenv.config();
 
 /** @type import('hardhat/config').HardhatUserConfig */
-module.exports = {
-  solidity: "0.8.24",
-  networks: {
-    flowEvmTestnet: {
-      url: process.env.FLOW_EVM_TESTNET_RPC || "https://testnet.evm.nodes.onflow.org",
-      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
-      chainId: 545,
+export default {
+  solidity: {
+    version: "0.8.24",
+    settings: {
+      evmVersion: "cancun",
     },
-    flowEvmMainnet: {
-      url: process.env.FLOW_EVM_MAINNET_RPC || "https://mainnet.evm.nodes.onflow.org",
+  },
+  networks: {
+    alfajores: {
+      type: "http",
+      url: process.env.CELO_ALFAJORES_RPC || "https://alfajores-forno.celo-testnet.org",
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
-      chainId: 747,
+      chainId: 44787,
+    },
+    celo: {
+      type: "http",
+      url: process.env.CELO_MAINNET_RPC || "https://forno.celo.org",
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+      chainId: 42220,
     },
   },
   etherscan: {
     apiKey: {
-      flowEvmTestnet: "YOUR_API_KEY",
-      flowEvmMainnet: "YOUR_API_KEY",
+      alfajores: process.env.CELOSCAN_API_KEY || "YOUR_API_KEY",
+      celo: process.env.CELOSCAN_API_KEY || "YOUR_API_KEY",
     },
     customChains: [
       {
-        network: "flowEvmTestnet",
-        chainId: 545,
+        network: "alfajores",
+        chainId: 44787,
         urls: {
-          apiURL: "https://evm-testnet.flowscan.org/api",
-          browserURL: "https://evm-testnet.flowscan.org",
+          apiURL: "https://api-alfajores.celoscan.io/api",
+          browserURL: "https://alfajores.celoscan.io/",
         },
       },
       {
-        network: "flowEvmMainnet",
-        chainId: 747,
+        network: "celo",
+        chainId: 42220,
         urls: {
-          apiURL: "https://evm.flowscan.org/api",
-          browserURL: "https://evm.flowscan.org",
+          apiURL: "https://api.celoscan.io/api",
+          browserURL: "https://celoscan.io/",
         },
       },
     ],
   },
-}
+};

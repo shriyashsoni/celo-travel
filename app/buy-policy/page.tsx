@@ -1,288 +1,250 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Badge } from "@/components/ui/badge"
-import { Plane, DollarSign, Shield } from "lucide-react"
-import { useFlowWallet } from "@/components/flow-wallet-provider"
-import { createClient } from "@/lib/supabase/client"
+import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { Plane, Shield, ShieldCheck, Activity, CheckCircle } from "lucide-react";
+import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
+import { parseAbi, parseUnits } from "viem";
 
-interface FlightInfo {
-  airline: string
-  flightNumber: string
-  departureDate: string
-  departureAirport: string
-  arrivalAirport: string
-}
+const INSURANCE_POOL_ADDRESS = process.env.NEXT_PUBLIC_INSURANCE_POOL_ADDRESS as `0x${string}` || "0x0000000000000000000000000000000000000000";
+const CUSD_ADDRESS = "0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1"; // Alfajores cUSD
 
-interface PolicyOption {
-  name: string
-  coverage: number
-  premium: number
-  description: string
-}
+const erc20Abi = parseAbi([
+  'function allowance(address owner, address spender) view returns (uint256)',
+  'function approve(address spender, uint256 amount) returns (bool)'
+]);
 
-const policyOptions: PolicyOption[] = [
-  {
-    name: "Basic Protection",
-    coverage: 100,
-    premium: 5,
-    description: "Covers delays ≥3 hours and cancellations",
-  },
-  {
-    name: "Standard Coverage",
-    coverage: 250,
-    premium: 12,
-    description: "Enhanced coverage with baggage protection",
-  },
-  {
-    name: "Premium Shield",
-    coverage: 500,
-    premium: 25,
-    description: "Maximum coverage with priority support",
-  },
-]
+const poolAbi = parseAbi([
+  'function buyPolicy(string calldata flightId, uint8 tier, uint256 expiry) external'
+]);
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.1, duration: 0.5, ease: [0.22, 1, 0.36, 1] },
+  }),
+};
 
 export default function BuyPolicyPage() {
-  const { user, logIn, isLoading: walletLoading } = useFlowWallet()
-  const [flightInfo, setFlightInfo] = useState<FlightInfo>({
-    airline: "",
-    flightNumber: "",
-    departureDate: "",
-    departureAirport: "",
-    arrivalAirport: "",
-  })
-  const [selectedPolicy, setSelectedPolicy] = useState<PolicyOption | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
-  const [mounted, setMounted] = useState(false)
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
+  const { address, isConnected } = useAccount();
+  const [flightNumber, setFlightNumber] = useState("");
+  const [date, setDate] = useState("");
+  const [selectedTier, setSelectedTier] = useState<number | null>(null);
+
+  const tiers = [
+    { id: 1, delay: "> 2 Hours", premium: "0.50 cUSD", premiumValue: "0.5", payout: "$5 cUSD" },
+    { id: 2, delay: "> 4 Hours", premium: "1.50 cUSD", premiumValue: "1.5", payout: "$15 cUSD" },
+    { id: 3, delay: "Cancelled", premium: "3.00 cUSD", premiumValue: "3.0", payout: "$30 cUSD" },
+  ];
+
+  const selectedPremium = selectedTier ? tiers.find(t => t.id === selectedTier)?.premiumValue : "0";
+  const premiumInWei = parseUnits(selectedPremium || "0", 18);
+
+  // Read Allowance
+  const { data: allowance, refetch: refetchAllowance } = useReadContract({
+    address: CUSD_ADDRESS,
+    abi: erc20Abi,
+    functionName: 'allowance',
+    args: [address as `0x${string}`, INSURANCE_POOL_ADDRESS],
+    query: { enabled: !!address },
+  });
+
+  const needsApproval = allowance !== undefined && (allowance as bigint) < premiumInWei;
+
+  const { writeContract, data: txHash, isPending } = useWriteContract();
+
+  const { isLoading: isTxConfirming, isSuccess: isTxSuccess } = useWaitForTransactionReceipt({
+    hash: txHash,
+  });
 
   useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  const handlePurchase = async () => {
-    if (!user?.loggedIn || !selectedPolicy) return
-
-    setIsLoading(true)
-    try {
-      // Create policy record in database
-      const supabase = createClient()
-      const policyData = {
-        user_id: user.addr,
-        policy_number: `POL-${Date.now()}`,
-        premium_amount: selectedPolicy.premium,
-        coverage_amount: selectedPolicy.coverage,
-        flight_info: flightInfo,
-        trigger_conditions: {
-          delay_threshold: 180,
-          covers_cancellation: true,
-          covers_baggage: selectedPolicy.name !== "Basic Protection",
-        },
-        valid_from: new Date().toISOString(),
-        valid_until: new Date(flightInfo.departureDate + "T23:59:59Z").toISOString(),
-        status: "active",
-      }
-
-      const { data: policy, error } = await supabase.from("policies").insert(policyData).select().single()
-
-      if (error) throw error
-
-      // TODO: Mint NFT on Flow blockchain
-      // This would involve calling the FlowTravel smart contract
-      console.log("[v0] Policy created:", policy)
-
-      alert("Policy purchased successfully!")
-    } catch (error) {
-      console.error("[v0] Error purchasing policy:", error)
-      alert("Error purchasing policy. Please try again.")
-    } finally {
-      setIsLoading(false)
+    if (isTxSuccess) {
+      refetchAllowance();
     }
-  }
+  }, [isTxSuccess, refetchAllowance]);
 
-  if (!mounted || walletLoading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-6">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p>Loading wallet...</p>
-        </div>
-      </div>
-    )
-  }
+  const handleTransaction = () => {
+    if (!isConnected || !flightNumber || !date || !selectedTier) return;
 
-  if (!user?.loggedIn) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-6">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <CardTitle>Connect Your Wallet</CardTitle>
-            <CardDescription>Connect your Flow wallet to purchase travel insurance</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button onClick={logIn} className="w-full">
-              Connect Flow Wallet
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    )
-  }
+    if (needsApproval) {
+      writeContract({
+        address: CUSD_ADDRESS,
+        abi: erc20Abi,
+        functionName: 'approve',
+        args: [INSURANCE_POOL_ADDRESS, premiumInWei],
+      });
+    } else {
+      const flightDate = new Date(date);
+      // Expiry is set to 24 hours after flight date
+      const expiryTimestamp = Math.floor(flightDate.getTime() / 1000) + 86400; 
+      
+      writeContract({
+        address: INSURANCE_POOL_ADDRESS,
+        abi: poolAbi,
+        functionName: 'buyPolicy',
+        args: [flightNumber, selectedTier, BigInt(expiryTimestamp)],
+      });
+    }
+  };
+
+  if (!mounted) return null;
 
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="max-w-4xl mx-auto space-y-6">
-        <div className="text-center space-y-2">
-          <h1 className="text-3xl font-bold">Purchase Travel Insurance</h1>
-          <p className="text-muted-foreground">Protect your trip with blockchain-powered insurance</p>
-        </div>
+    <div className="min-h-screen flex flex-col bg-black text-white font-body overflow-x-hidden">
+      <main className="flex-1 pt-32 pb-20 px-6 sm:px-8 max-w-7xl mx-auto w-full relative z-10">
+        <motion.div custom={0} initial="hidden" animate="visible" variants={fadeUp} className="text-center mb-16">
+          <h1 className="text-5xl md:text-6xl font-heading italic mb-6">
+            Secure Your Flight On-Chain
+          </h1>
+          <p className="text-lg font-light text-white/60 max-w-2xl mx-auto">
+            Select your coverage, approve cUSD directly from your wallet, and instantly mint your parametric insurance Policy NFT.
+          </p>
+        </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Flight Information */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Plane className="h-5 w-5" />
-                Flight Information
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="airline">Airline</Label>
-                  <Input
-                    id="airline"
-                    placeholder="e.g., IndiGo"
-                    value={flightInfo.airline}
-                    onChange={(e) => setFlightInfo({ ...flightInfo, airline: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="flightNumber">Flight Number</Label>
-                  <Input
-                    id="flightNumber"
-                    placeholder="e.g., 6E234"
-                    value={flightInfo.flightNumber}
-                    onChange={(e) => setFlightInfo({ ...flightInfo, flightNumber: e.target.value })}
-                  />
-                </div>
-              </div>
-
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+          {/* Left Column: Form */}
+          <motion.div custom={1} initial="hidden" animate="visible" variants={fadeUp} className="liquid-glass rounded-3xl p-8">
+            <div className="flex items-center gap-3 mb-8 border-b border-white/10 pb-4">
+              <Plane className="text-white" size={24} />
+              <h2 className="text-2xl font-heading italic">Flight Details</h2>
+            </div>
+            
+            <div className="space-y-6">
               <div>
-                <Label htmlFor="departureDate">Departure Date</Label>
-                <Input
-                  id="departureDate"
-                  type="date"
-                  value={flightInfo.departureDate}
-                  onChange={(e) => setFlightInfo({ ...flightInfo, departureDate: e.target.value })}
+                <label className="block text-sm font-medium text-white/70 mb-2">Flight Number</label>
+                <input 
+                  type="text" 
+                  className="w-full liquid-glass bg-transparent border-none rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:ring-1 focus:ring-white/50 transition-all uppercase"
+                  placeholder="e.g. AA123"
+                  value={flightNumber}
+                  onChange={(e) => setFlightNumber(e.target.value.toUpperCase())}
                 />
               </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="departure">From</Label>
-                  <Input
-                    id="departure"
-                    placeholder="DEL"
-                    value={flightInfo.departureAirport}
-                    onChange={(e) => setFlightInfo({ ...flightInfo, departureAirport: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="arrival">To</Label>
-                  <Input
-                    id="arrival"
-                    placeholder="BOM"
-                    value={flightInfo.arrivalAirport}
-                    onChange={(e) => setFlightInfo({ ...flightInfo, arrivalAirport: e.target.value })}
-                  />
-                </div>
+              <div>
+                <label className="block text-sm font-medium text-white/70 mb-2">Departure Date</label>
+                <input 
+                  type="date" 
+                  className="w-full liquid-glass bg-transparent border-none rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-1 focus:ring-white/50 transition-all"
+                  value={date}
+                  style={{ colorScheme: "dark" }}
+                  onChange={(e) => setDate(e.target.value)}
+                />
               </div>
-            </CardContent>
-          </Card>
+            </div>
 
-          {/* Policy Selection */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Shield className="h-5 w-5" />
-                Coverage Options
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {policyOptions.map((option) => (
-                <div
-                  key={option.name}
-                  className={`p-4 rounded-lg border cursor-pointer transition-colors ${
-                    selectedPolicy?.name === option.name
-                      ? "border-primary bg-primary/5"
-                      : "border-border hover:border-primary/50"
+            <div className="flex items-center gap-3 mb-6 mt-10 border-b border-white/10 pb-4">
+              <Shield className="text-white" size={24} />
+              <h2 className="text-2xl font-heading italic">Coverage Tiers</h2>
+            </div>
+
+            <div className="space-y-4">
+              {tiers.map((tier) => (
+                <div 
+                  key={tier.id}
+                  onClick={() => setSelectedTier(tier.id)}
+                  className={`relative p-5 rounded-2xl cursor-pointer transition-all ${
+                    selectedTier === tier.id 
+                      ? "liquid-glass-strong ring-1 ring-green-500/50" 
+                      : "liquid-glass hover:bg-white/5"
                   }`}
-                  onClick={() => setSelectedPolicy(option)}
                 >
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="font-semibold">{option.name}</h3>
-                    <Badge variant="secondary">${option.premium}</Badge>
+                  {selectedTier === tier.id && (
+                    <div className="absolute top-4 right-4 text-green-400">
+                      <ShieldCheck size={20} />
+                    </div>
+                  )}
+                  <div className="flex justify-between items-center mb-1">
+                    <h3 className="font-heading italic text-xl">{tier.delay}</h3>
+                    <span className="font-bold">{tier.premium}</span>
                   </div>
-                  <p className="text-sm text-muted-foreground mb-2">{option.description}</p>
-                  <div className="flex items-center gap-2 text-sm">
-                    <DollarSign className="h-4 w-4" />
-                    <span>Coverage: ${option.coverage}</span>
-                  </div>
+                  <p className="text-sm text-white/60 font-light">Autonomous Payout: <span className="font-semibold text-white/90">{tier.payout}</span></p>
                 </div>
               ))}
-            </CardContent>
-          </Card>
-        </div>
+            </div>
+          </motion.div>
 
-        {/* Purchase Summary */}
-        {selectedPolicy && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Purchase Summary</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2 mb-4">
-                <div className="flex justify-between">
-                  <span>Flight:</span>
-                  <span>
-                    {flightInfo.airline} {flightInfo.flightNumber}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Route:</span>
-                  <span>
-                    {flightInfo.departureAirport} → {flightInfo.arrivalAirport}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Date:</span>
-                  <span>{flightInfo.departureDate}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Coverage:</span>
-                  <span>${selectedPolicy.coverage}</span>
-                </div>
-                <div className="flex justify-between font-semibold">
-                  <span>Premium:</span>
-                  <span>${selectedPolicy.premium}</span>
-                </div>
+          {/* Right Column: Summary & Tx */}
+          <motion.div custom={2} initial="hidden" animate="visible" variants={fadeUp} className="liquid-glass rounded-3xl p-8 flex flex-col relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full blur-3xl"></div>
+            <h2 className="text-3xl font-heading italic mb-8 relative z-10">Checkout Summary</h2>
+            
+            <div className="flex-1 space-y-6 relative z-10">
+              <div className="flex justify-between items-center pb-4 border-b border-white/10">
+                <span className="text-white/60">Flight</span>
+                <span className="font-medium font-mono">{flightNumber || "---"}</span>
+              </div>
+              <div className="flex justify-between items-center pb-4 border-b border-white/10">
+                <span className="text-white/60">Date</span>
+                <span className="font-medium">{date || "---"}</span>
+              </div>
+              <div className="flex justify-between items-center pb-4 border-b border-white/10">
+                <span className="text-white/60">Selected Tier</span>
+                <span className="font-medium">
+                  {selectedTier ? tiers.find(t => t.id === selectedTier)?.delay : "None"}
+                </span>
+              </div>
+              <div className="flex justify-between items-center pb-4 border-b border-white/10">
+                <span className="text-white/60">Payout Amount</span>
+                <span className="font-medium text-green-400">
+                  {selectedTier ? tiers.find(t => t.id === selectedTier)?.payout : "$0"}
+                </span>
+              </div>
+            </div>
+
+            <div className="mt-8 pt-6 border-t border-white/20 relative z-10">
+              <div className="flex justify-between items-center mb-8">
+                <span className="text-lg text-white/80">Total Premium</span>
+                <span className="text-3xl font-heading italic text-white">
+                  {selectedTier ? tiers.find(t => t.id === selectedTier)?.premium : "0.00 cUSD"}
+                </span>
+              </div>
+              
+              <button 
+                onClick={handleTransaction}
+                disabled={!flightNumber || !date || !selectedTier || isPending || isTxConfirming || !isConnected}
+                className={`w-full py-4 rounded-full font-medium text-black transition-all flex items-center justify-center gap-2 ${
+                  needsApproval ? "bg-yellow-400 hover:bg-yellow-300" : "bg-white hover:bg-white/90"
+                } disabled:opacity-50 disabled:cursor-not-allowed`}
+              >
+                {!isConnected ? (
+                  "Connect Wallet to Buy"
+                ) : isPending || isTxConfirming ? (
+                  <>
+                    <Activity className="animate-spin" size={18} />
+                    Confirming on Celo...
+                  </>
+                ) : isTxSuccess && !needsApproval ? (
+                  <>
+                    <CheckCircle size={18} />
+                    Policy Minted!
+                  </>
+                ) : needsApproval ? (
+                  "Approve cUSD"
+                ) : (
+                  "Pay & Mint Policy NFT"
+                )}
+              </button>
+
+              <div className="mt-4 flex items-center justify-center gap-2 text-xs text-white/40">
+                {needsApproval ? (
+                  <span className="text-yellow-400/80">Step 1: Approve Token Spend</span>
+                ) : (
+                  <span className="text-green-400/80">Step 2: Mint Policy NFT</span>
+                )}
               </div>
 
-              <Button
-                onClick={handlePurchase}
-                disabled={isLoading || !flightInfo.flightNumber || !flightInfo.departureDate}
-                className="w-full"
-              >
-                {isLoading ? "Processing..." : `Purchase Policy - $${selectedPolicy.premium}`}
-              </Button>
-            </CardContent>
-          </Card>
-        )}
-      </div>
+              <p className="text-center text-xs text-white/30 mt-4 font-light">
+                Securely processed via Celo Smart Contracts. No intermediary.
+              </p>
+            </div>
+          </motion.div>
+        </div>
+      </main>
     </div>
-  )
+  );
 }

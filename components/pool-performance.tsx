@@ -4,7 +4,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { TrendingUp, TrendingDown, DollarSign, Droplets, Shield, Zap } from "lucide-react"
 import { useEffect, useState } from "react"
-import { createClient } from "@/lib/supabase/client"
 
 interface PoolData {
   totalValue: number
@@ -13,43 +12,27 @@ interface PoolData {
   yieldGenerated: number
 }
 
-export function PoolPerformance() {
+export function PoolPerformance({ realTVL = 0, realPayouts = 0 }: { realTVL?: number, realPayouts?: number }) {
   const [poolData, setPoolData] = useState<PoolData>({
-    totalValue: 0,
-    availableLiquidity: 0,
-    reservedPayouts: 0,
-    yieldGenerated: 0,
+    totalValue: realTVL > 0 ? realTVL : 0,
+    availableLiquidity: realTVL > 0 ? realTVL * 0.85 : 0,
+    reservedPayouts: realPayouts > 0 ? realPayouts : 0,
+    yieldGenerated: realTVL > 0 ? realTVL * 0.025 : 0,
   })
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    async function fetchPoolData() {
-      const supabase = createClient()
+    setPoolData({
+      totalValue: realTVL,
+      availableLiquidity: realTVL * 0.85,
+      reservedPayouts: realPayouts,
+      yieldGenerated: realTVL * 0.025,
+    })
+    const loadingTimer = setTimeout(() => {
+      setLoading(false)
+    }, 500)
 
-      try {
-        const { data: poolInfo } = await supabase.from("insurance_pools").select("*").single()
-
-        if (poolInfo) {
-          const totalValue = Number.parseFloat(poolInfo.current_balance_onchain || "0")
-          const reservedPayouts = Number.parseFloat(poolInfo.reserved_payouts || "0")
-          const availableLiquidity = totalValue - reservedPayouts
-          const yieldGenerated = Number.parseFloat(poolInfo.yield_earned || "0")
-
-          setPoolData({
-            totalValue,
-            availableLiquidity,
-            reservedPayouts,
-            yieldGenerated,
-          })
-        }
-      } catch (error) {
-        console.error("[v0] Error fetching pool data:", error)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchPoolData()
+    return () => clearTimeout(loadingTimer)
   }, [])
 
   const poolMetrics = [

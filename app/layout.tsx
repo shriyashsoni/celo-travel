@@ -1,15 +1,14 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { GeistSans } from "geist/font/sans"
-import { GeistMono } from "geist/font/mono"
 import { Analytics } from "@vercel/analytics/next"
-import { FlowWalletProvider } from "@/components/flow-wallet-provider"
+import { Providers } from "@/components/Providers"
 import { Suspense } from "react"
+import Navbar from "@/components/Navbar"
 import "./globals.css"
 
 export const metadata: Metadata = {
-  title: "FlowTravel Insurance",
-  description: "Decentralized Travel Insurance on Flow Blockchain",
+  title: "TravelShield | Parametric Flight Insurance on Celo",
+  description: "AI-powered, automated flight delay insurance paid out in cUSD on the Celo network.",
   generator: "v0.app",
 }
 
@@ -20,9 +19,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable}`}>
+      <body className="font-body text-foreground antialiased bg-black overflow-x-hidden">
         <Suspense fallback={<div>Loading...</div>}>
-          <FlowWalletProvider>{children}</FlowWalletProvider>
+          <Providers>
+            <Navbar />
+            {children}
+          </Providers>
         </Suspense>
         <Analytics />
       </body>
