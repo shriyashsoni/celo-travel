@@ -8,7 +8,7 @@ import { parseAbi, parseUnits } from "viem";
 import { toast } from "sonner";
 
 const INSURANCE_POOL_ADDRESS = process.env.NEXT_PUBLIC_INSURANCE_POOL_ADDRESS as `0x${string}` || "0x78bf048E450Ec94cB055C8ab180CA27c912e975e";
-const CUSD_ADDRESS = "0x954cBA141f21760751E3065ACC250c38fb9f5e61"; // Sepolia cUSD
+const CUSD_ADDRESS = "0x82fc23020f1cf58EA47d4a0dDDc2F8C42BE65705"; // Sepolia cUSD
 
 const erc20Abi = parseAbi([
   'function allowance(address owner, address spender) view returns (uint256)',
