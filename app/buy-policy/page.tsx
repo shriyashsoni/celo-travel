@@ -39,6 +39,9 @@ export default function BuyPolicyPage() {
   const [flightNumber, setFlightNumber] = useState("");
   const [date, setDate] = useState("");
   const [selectedTier, setSelectedTier] = useState<number | null>(null);
+  
+  // Track transaction steps to separate Approval success from Purchase success
+  const [txType, setTxType] = useState<'idle' | 'approving' | 'minting'>('idle');
 
   const tiers = [
     { id: 1, delay: "> 2 Hours", premium: "0.50 cUSD", premiumValue: "0.5", payout: "$5 cUSD" },
@@ -69,8 +72,12 @@ export default function BuyPolicyPage() {
   useEffect(() => {
     if (isTxSuccess) {
       refetchAllowance();
+      if (txType === 'approving') {
+        const timer = setTimeout(() => setTxType('idle'), 1000);
+        return () => clearTimeout(timer);
+      }
     }
-  }, [isTxSuccess, refetchAllowance]);
+  }, [isTxSuccess, refetchAllowance, txType]);
 
   const handleTransaction = () => {
     if (!isConnected) return;
@@ -83,6 +90,7 @@ export default function BuyPolicyPage() {
     if (!flightNumber || !date || !selectedTier) return;
 
     if (needsApproval) {
+      setTxType('approving');
       writeContract({
         address: CUSD_ADDRESS,
         abi: erc20Abi,
@@ -90,6 +98,7 @@ export default function BuyPolicyPage() {
         args: [INSURANCE_POOL_ADDRESS, premiumInWei],
       });
     } else {
+      setTxType('minting');
       const flightDate = new Date(date);
       // Expiry is set to 24 hours after flight date
       const expiryTimestamp = Math.floor(flightDate.getTime() / 1000) + 86400; 
@@ -231,12 +240,12 @@ export default function BuyPolicyPage() {
                 ) : isPending || isTxConfirming ? (
                   <>
                     <Activity className="animate-spin" size={18} />
-                    Confirming on Celo...
+                    {txType === 'approving' ? "Approving cUSD..." : "Minting Policy..."}
                   </>
-                ) : isTxSuccess && !needsApproval ? (
+                ) : isTxSuccess && txType === 'minting' ? (
                   <>
                     <CheckCircle size={18} />
-                    Policy Minted!
+                    Policy Minted! 🎉
                   </>
                 ) : needsApproval ? (
                   "Approve cUSD"
@@ -250,6 +259,8 @@ export default function BuyPolicyPage() {
                   <span className="text-white/40">Connect your Web3 wallet to begin</span>
                 ) : !isCorrectChain ? (
                   <span className="text-red-400 font-medium">Wrong Network: MetaMask must be on Celo Sepolia</span>
+                ) : isTxSuccess && txType === 'minting' ? (
+                  <span className="text-green-400 font-medium">Success! Policy registered on-chain.</span>
                 ) : needsApproval ? (
                   <span className="text-yellow-400/80">Step 1: Approve Token Spend</span>
                 ) : (
