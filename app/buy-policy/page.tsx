@@ -70,14 +70,22 @@ export default function BuyPolicyPage() {
   });
 
   useEffect(() => {
-    if (isTxSuccess) {
-      refetchAllowance();
+    if (txHash) {
       if (txType === 'approving') {
-        const timer = setTimeout(() => setTxType('idle'), 1000);
+        const timer = setTimeout(() => {
+          setTxType('idle');
+          refetchAllowance();
+        }, 2000);
         return () => clearTimeout(timer);
       }
     }
-  }, [isTxSuccess, refetchAllowance, txType]);
+  }, [txHash, txType, refetchAllowance]);
+
+  useEffect(() => {
+    if (isTxSuccess) {
+      refetchAllowance();
+    }
+  }, [isTxSuccess, refetchAllowance]);
 
   const handleTransaction = () => {
     if (!isConnected) return;
