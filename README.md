@@ -1,285 +1,124 @@
-# 🛡️ FlowTravel Insurance dApp
+<div align="center">
+  <h1>🛡️ TravelShield | Celo Autonomous Insurance</h1>
+  <p><em>The Next-Generation Parametric Travel Insurance Protocol powered by AI, deployed on the Celo Network.</em></p>
+  
+  [![Celo](https://img.shields.io/badge/Deployed_on-Celo-35D07F?style=for-the-badge&logo=celo&logoColor=white)](https://celo.org/)
+  [![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)](https://nextjs.org/)
+  [![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+  [![Solidity](https://img.shields.io/badge/Solidity-%23363636.svg?style=for-the-badge&logo=solidity&logoColor=white)](https://soliditylang.org/)
+</div>
 
-
-<img width="1568" height="238" alt="Screenshot 2025-08-31 234134" src="https://github.com/user-attachments/assets/2a608342-1e1f-4773-bba5-0d4ec3835432" />
-
-
-*A comprehensive decentralized travel insurance platform built on Flow blockchain*
-
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/apna-codings-projects/v0-travel-insurance-d-app)
-[![Built with v0](https://img.shields.io/badge/Built%20with-v0.app-black?style=for-the-badge)](https://v0.app/chat/projects/X4LnV9m82Vi)
-[![Flow Blockchain](https://img.shields.io/badge/Flow-Blockchain-00EF8B?style=for-the-badge&logo=flow)](https://flow.com)
-[![Next.js](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js)](https://nextjs.org)
+<br />
 
 ## 🌟 Overview
 
-FlowTravel is a revolutionary decentralized travel insurance platform that leverages blockchain technology to provide transparent, automated, and trustless insurance coverage for travelers worldwide. Built on Flow blockchain with support for both EVM and Cadence smart contracts.
+**TravelShield** transforms the archaic, paper-heavy travel insurance industry into a fully autonomous, transparent, and instant protocol. By leveraging the **Celo Blockchain**, **Groq LLM Intelligence**, and **AviationStack Oracles**, TravelShield completely eliminates the "claims process." If your flight is delayed, the AI Oracle verifies it, and the smart contract pays you out in **cUSD** automatically. No paperwork. No waiting. Just instant liquidity.
 
-### ✨ Key Features
+---
 
-- **🎫 NFT-Based Policies**: Each insurance policy is minted as an NFT for true ownership
-- **🤖 Automated Claims**: Smart contract-powered automatic claim processing
-- **💰 Liquidity Pools**: Decentralized insurance pools with yield generation
-- **🔮 Oracle Integration**: Real-time data feeds for flight delays, weather, and more
-- **📊 Analytics Dashboard**: Comprehensive admin interface for pool management
-- **🔐 Multi-Network Support**: Deploy on Flow EVM or Cadence networks
-- **⚡ Real-time Updates**: Live data synchronization with Supabase
+## 🏗️ Architecture & Data Flow
 
-## 🏗️ Architecture
+Our protocol is entirely decentralized and autonomous. Here is the lifecycle of a Policy NFT from mint to automatic claim settlement:
 
-### Smart Contracts
+```mermaid
+graph TD
+    A[User Connects Wallet] -->|Approves cUSD| B(Buys Policy via Smart Contract)
+    B -->|Mints| C{Policy NFT Issued}
+    C -->|Flight Status Monitored| D[AviationStack API]
+    D -->|Real-Time Flight Data| E[Groq AI Oracle Agent]
+    E -->|Analyzes Delay > 120 mins| F{Qualifies for Payout?}
+    F -->|Yes| G[Autonomous Signer Triggers Smart Contract]
+    F -->|No| H[Policy Remains Active / Expires]
+    G -->|Instant Settlement| I((cUSD Transferred to User Wallet))
+```
 
-#### Flow EVM (Solidity)
-- **Contract Address (Testnet)**: `0x5FbDB2315678afecb367f032d93F642f64180aa3`
-- **Contract Address (Mainnet)**: `0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512`
+---
 
-#### Flow Cadence
-- **Contract Address (Testnet)**: `0x045a1763c93006ca`
-- **Contract Address (Mainnet)**: `0x1d7e57aa55817448`
+## ⚡ Core Technologies & APIs
 
-### Tech Stack
+TravelShield integrates state-of-the-art Web3 and Web2 infrastructure to guarantee 100% realism and production readiness.
 
-- **Frontend**: Next.js 15, React 19, TypeScript
-- **Styling**: Tailwind CSS v4, shadcn/ui components
-- **Blockchain**: Flow EVM & Cadence smart contracts
-- **Database**: Supabase (PostgreSQL)
-- **Authentication**: Supabase Auth
-- **Wallet Integration**: Flow FCL (Flow Client Library)
-- **Charts**: Recharts for analytics visualization
-- **Deployment**: Vercel
+| Technology | Purpose | Implementation Details |
+| :--- | :--- | :--- |
+| **Celo Network** | Settlement Layer | Ultra-low fee, mobile-first stablecoin (cUSD) transactions on Celo Sepolia. |
+| **Wagmi & Viem** | Web3 Hooks | Manages direct interaction with the `InsurancePool` and `PolicyNFT` contracts. |
+| **AviationStack API** | Flight Data Oracle | Provides live, real-world flight status, departure delays, and cancellations. |
+| **Groq API** | AI Decision Engine | Powers the Autonomous Agent that parses flight data and triggers contract execution at lightning speeds. |
+| **CeloScan API** | Real-Time Indexing | Dynamically indexes and feeds historical on-chain events straight to the Admin Dashboard. |
+| **WalletConnect** | Authentication | Secures the user connection with deep linking for mobile and desktop wallets. |
 
-## 🚀 Quick Start
+---
+
+## 📜 Smart Contract Deployments (Celo Sepolia Testnet)
+
+Our contracts are fully deployed and verified on the Celo network. 
+
+- **Policy NFT (ERC-721)**: [`0x4a2198F52f2E57047F21116Ed6Bb242600D8ce72`](https://celoscan.io/address/0x4a2198F52f2E57047F21116Ed6Bb242600D8ce72)
+- **Insurance Liquidity Pool**: [`0x59575D99d6691d109651C5bF357d78851dF90edB`](https://celoscan.io/address/0x59575D99d6691d109651C5bF357d78851dF90edB)
+- **Agent Registry**: [`0x508Da3a7a6d0FD9681BcCBC5C8b58fb3E0548B51`](https://celoscan.io/address/0x508Da3a7a6d0FD9681BcCBC5C8b58fb3E0548B51)
+- **Settlement Token**: `cUSD (Alfajores)`
+
+---
+
+## 💻 Dashboard Features
+
+### 🔐 Admin Portal (`/admin`)
+- **Restricted Access**: Secured by an admin authentication layer.
+- **On-Chain Analytics**: Tracks Live TVL, Active Policyholders, and Total Premiums Collected natively from the Celo Blockchain.
+- **Policy Creator Tool**: Manually issue Custom Tier Policies (Delay vs. Cancellation) to any wallet address.
+- **Live CeloScan Feed**: A real-time terminal fetching network events directly from Celo blocks.
+- **Autonomous AI Oracle Demo**: An interactive module that queries real flights and showcases Groq LLM's exact reasoning process before simulating an on-chain signature.
+
+### 👤 User Dashboard (`/policies`)
+- **NFT Gallery**: View your minted TravelShield policies in a stunning Liquid Glass UI.
+- **Live Tracking**: See exactly when your policy expires and whether it is actively monitoring your flight or if a claim has been settled.
+- **1-Click Purchase**: Seamlessly approve cUSD and mint a new policy directly from the frontend.
+
+---
+
+## 🚀 Getting Started
 
 ### Prerequisites
-
-- Node.js 18+ and npm/yarn/bun
-- Flow CLI (for Cadence deployment)
-- Hardhat (for EVM deployment)
+- Node.js `v18+`
+- Celo Wallet or MetaMask (configured for Celo Alfajores Testnet)
+- Testnet cUSD (from Celo Faucet)
 
 ### Installation
 
 1. **Clone the repository**
-   \`\`\`bash
-   git clone https://github.com/your-username/flowtravel-insurance.git
-   cd flowtravel-insurance
-   \`\`\`
+   ```bash
+   git clone https://github.com/shriyashsoni/celo-travel.git
+   cd celo-travel
+   ```
 
 2. **Install dependencies**
-   \`\`\`bash
+   ```bash
    npm install
-   # or
-   bun install
-   \`\`\`
+   ```
 
-3. **Environment Setup**
-   \`\`\`bash
-   cp .env.example .env.local
-   \`\`\`
-
-4. **Configure environment variables**
-   \`\`\`env
-   # Supabase Configuration
-   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-   SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-
-   # Flow Network Configuration
-   NEXT_PUBLIC_FLOW_NETWORK=testnet
-   NEXT_PUBLIC_FLOW_CONTRACT_TYPE=evm
-   NEXT_PUBLIC_FLOW_WALLET_DISCOVERY=https://fcl-discovery.onflow.org/testnet/authn
-
-   # Contract Addresses
-   NEXT_PUBLIC_FLOW_EVM_TESTNET_CONTRACT=0x5FbDB2315678afecb367f032d93F642f64180aa3
-   NEXT_PUBLIC_FLOW_EVM_MAINNET_CONTRACT=0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512
-   NEXT_PUBLIC_FLOW_CADENCE_TESTNET_CONTRACT=0x045a1763c93006ca
-   NEXT_PUBLIC_FLOW_CADENCE_MAINNET_CONTRACT=0x1d7e57aa55817448
-   \`\`\`
-
-5. **Database Setup**
-   \`\`\`bash
-   # Run database migrations
-   npm run db:setup
-   \`\`\`
-
-6. **Start development server**
-   \`\`\`bash
-   npm run dev
-   \`\`\`
-
-Visit `http://localhost:3000` to see the application.
-
-## 📋 Database Schema
-
-The application uses the following main tables:
-
-- **users**: User profiles and authentication
-- **policies**: Insurance policy records
-- **claims**: Claim submissions and processing
-- **pools**: Insurance pool management
-- **oracles**: Oracle data feeds and status
-- **transactions**: Blockchain transaction records
-
-## 🔧 Smart Contract Deployment
-
-### Flow EVM Deployment
-
-1. **Configure Hardhat**
-   \`\`\`bash
-   # Install Hardhat dependencies
-   npm install --save-dev hardhat @nomicfoundation/hardhat-toolbox
-   \`\`\`
-
-2. **Deploy to testnet**
-   \`\`\`bash
-   npm run deploy:evm:testnet
-   \`\`\`
-
-3. **Deploy to mainnet**
-   \`\`\`bash
-   npm run deploy:evm:mainnet
-   \`\`\`
-
-### Flow Cadence Deployment
-
-1. **Install Flow CLI**
-   \`\`\`bash
-   # macOS
-   brew install flow-cli
+3. **Configure Environment Variables**
+   Create a `.env` file in the root directory and add your API keys:
+   ```env
+   NEXT_PUBLIC_POLICY_NFT_ADDRESS=0x4a2198F52f2E57047F21116Ed6Bb242600D8ce72
+   NEXT_PUBLIC_INSURANCE_POOL_ADDRESS=0x59575D99d6691d109651C5bF357d78851dF90edB
    
-   # Linux
-   sh -ci "$(curl -fsSL https://raw.githubusercontent.com/onflow/flow-cli/master/install.sh)"
-   \`\`\`
+   # APIs
+   CELOSCAN_API_KEY=your_celoscan_key
+   NEXT_PUBLIC_CELOSCAN_API_KEY=your_celoscan_key
+   AVIATIONSTACK_API_KEY=your_aviationstack_key
+   GROQ_API_KEY=your_groq_key
+   NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=your_walletconnect_id
+   PRIVATE_KEY=your_admin_wallet_private_key
+   ```
 
-2. **Deploy to emulator**
-   \`\`\`bash
-   npm run deploy:cadence:emulator
-   \`\`\`
+4. **Run the development server**
+   ```bash
+   npm run dev
+   ```
+   Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-3. **Deploy to testnet**
-   \`\`\`bash
-   npm run deploy:cadence:testnet
-   \`\`\`
+---
 
-## 📊 Features Overview
-
-### 🏠 Dashboard
-- Real-time policy metrics
-- Pool performance analytics
-- Claims processing status
-- Oracle health monitoring
-
-### 🎫 Policy Management
-- Create new travel insurance policies
-- View active and expired policies
-- NFT-based policy ownership
-- Automated premium calculations
-
-### 💰 Pool Management
-- Liquidity pool creation and management
-- Yield farming opportunities
-- Risk assessment and pricing
-- Pool performance tracking
-
-### 🔍 Claims Processing
-- Automated claim validation
-- Oracle-based verification
-- Smart contract payouts
-- Claims history and analytics
-
-### 🔮 Oracle Integration
-- Flight delay monitoring
-- Weather condition tracking
-- Real-time data feeds
-- Oracle reliability scoring
-
-## 🛠️ Development
-
-### Project Structure
-
-\`\`\`
-flowtravel-insurance/
-├── app/                    # Next.js app directory
-│   ├── admin/             # Admin dashboard pages
-│   ├── auth/              # Authentication pages
-│   └── api/               # API routes
-├── components/            # React components
-├── contracts/             # Smart contracts
-│   ├── FlowTravelInsurance.cdc    # Cadence contract
-│   └── FlowTravelInsuranceEVM.sol # Solidity contract
-├── lib/                   # Utility libraries
-│   ├── contracts/         # Contract configurations
-│   ├── supabase/         # Database client
-│   └── flow/             # Flow blockchain utilities
-├── scripts/              # Deployment and utility scripts
-└── public/               # Static assets
-\`\`\`
-
-### Available Scripts
-
-\`\`\`bash
-# Development
-npm run dev              # Start development server
-npm run build           # Build for production
-npm run start           # Start production server
-
-# Database
-npm run db:setup        # Setup database schema
-npm run db:seed         # Seed sample data
-npm run db:reset        # Reset database
-
-# Smart Contracts
-npm run deploy:evm:testnet     # Deploy EVM contract to testnet
-npm run deploy:evm:mainnet     # Deploy EVM contract to mainnet
-npm run deploy:cadence:emulator # Deploy Cadence to emulator
-npm run deploy:cadence:testnet  # Deploy Cadence to testnet
-
-# Utilities
-npm run lint            # Run ESLint
-npm run type-check      # TypeScript type checking
-\`\`\`
-
-## 🌐 API Endpoints
-
-### Policies
-- `GET /api/policies` - List all policies
-- `POST /api/policies` - Create new policy
-- `GET /api/policies/[id]` - Get policy details
-- `PUT /api/policies/[id]` - Update policy
-
-### Claims
-- `GET /api/claims` - List all claims
-- `POST /api/claims` - Submit new claim
-- `PUT /api/claims/[id]` - Update claim status
-
-### Pools
-- `GET /api/pools` - List insurance pools
-- `POST /api/pools` - Create new pool
-- `GET /api/pools/[id]/performance` - Pool analytics
-
-## 🔐 Security
-
-- **Smart Contract Auditing**: Contracts follow best practices and security patterns
-- **Access Control**: Role-based permissions for admin functions
-- **Data Encryption**: Sensitive data encrypted at rest and in transit
-- **Oracle Security**: Multiple oracle sources for data verification
-- **Wallet Security**: Non-custodial wallet integration
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🆘 Support
-
-- **Documentation**: [Flow Documentation](https://docs.onflow.org)
-- **Discord**: [Flow Discord Community](https://discord.gg/flow)
-- **Issues**: [GitHub Issues](https://github.com/your-username/flowtravel-insurance/issues)
-
-
+<div align="center">
+  <i>Built for the Future of Decentralized Finance & Travel.</i>
+</div>
