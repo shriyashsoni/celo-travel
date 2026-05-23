@@ -6,7 +6,7 @@ import { Plane, Shield, ShieldCheck, Activity, CheckCircle } from "lucide-react"
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { parseAbi, parseUnits } from "viem";
 
-const INSURANCE_POOL_ADDRESS = process.env.NEXT_PUBLIC_INSURANCE_POOL_ADDRESS as `0x${string}` || "0x0000000000000000000000000000000000000000";
+const INSURANCE_POOL_ADDRESS = process.env.NEXT_PUBLIC_INSURANCE_POOL_ADDRESS as `0x${string}` || "0x59575D99d6691d109651C5bF357d78851dF90edB";
 const CUSD_ADDRESS = "0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1"; // Alfajores cUSD
 
 const erc20Abi = parseAbi([
@@ -54,7 +54,7 @@ export default function BuyPolicyPage() {
     query: { enabled: !!address },
   });
 
-  const needsApproval = allowance !== undefined && (allowance as bigint) < premiumInWei;
+  const needsApproval = allowance === undefined || (allowance as bigint) < premiumInWei;
 
   const { writeContract, data: txHash, isPending } = useWriteContract();
 
