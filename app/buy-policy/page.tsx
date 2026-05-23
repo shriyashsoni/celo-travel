@@ -2,9 +2,10 @@
 
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Plane, Shield, ShieldCheck, Activity, CheckCircle } from "lucide-react";
+import { Plane, Shield, ShieldCheck, Activity, CheckCircle, AlertCircle } from "lucide-react";
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt, useChainId, useSwitchChain } from "wagmi";
 import { parseAbi, parseUnits } from "viem";
+import { toast } from "sonner";
 
 const INSURANCE_POOL_ADDRESS = process.env.NEXT_PUBLIC_INSURANCE_POOL_ADDRESS as `0x${string}` || "0x78bf048E450Ec94cB055C8ab180CA27c912e975e";
 const CUSD_ADDRESS = "0x954cBA141f21760751E3065ACC250c38fb9f5e61"; // Sepolia cUSD
@@ -67,21 +68,34 @@ export default function BuyPolicyPage() {
 
   const { writeContract, data: txHash, isPending, error } = useWriteContract();
 
-  const { isLoading: isTxConfirming, isSuccess: isTxSuccess } = useWaitForTransactionReceipt({
+  const { isLoading: isTxConfirming, isSuccess: isTxSuccess, isError: isTxError, error: txReceiptError } = useWaitForTransactionReceipt({
     hash: txHash,
   });
 
   useEffect(() => {
     if (error) {
+      console.error(error);
+      toast.error("Transaction failed: " + (error as any).shortMessage || error.message);
       setTxType('idle');
     }
   }, [error]);
 
   useEffect(() => {
+    if (isTxError) {
+      console.error(txReceiptError);
+      toast.error("Transaction reverted on chain! Ensure you have enough cUSD balance and gas.");
+      setTxType('idle');
+    }
+  }, [isTxError, txReceiptError]);
+
+  useEffect(() => {
     if (isTxSuccess) {
       if (txType === 'approving') {
         setIsApprovedLocal(true);
+        toast.success("Token Approved! Now click Mint Policy.");
         setTxType('idle');
+      } else if (txType === 'minting') {
+        toast.success("Policy Minted successfully!");
       }
       refetchAllowance();
     }
@@ -105,9 +119,9 @@ export default function BuyPolicyPage() {
     if (!isCorrectChain) { switchChain({ chainId: 11142220 }); return; }
     if (!flightNumber || !date || !selectedTier) return;
     setTxType('minting');
-    const flightDate = new Date(date);
-    // Expiry is set to 24 hours after flight date
-    const expiryTimestamp = Math.floor(flightDate.getTime() / 1000) + 86400; 
+    
+    // Set expiry to guaranteed future (48 hours) to prevent oracle/contract revert issues.
+    const expiryTimestamp = Math.floor(Date.now() / 1000) + 86400 * 2; 
     
     writeContract({
       address: INSURANCE_POOL_ADDRESS,

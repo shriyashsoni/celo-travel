@@ -3,6 +3,7 @@ import type { Metadata } from "next"
 import { Analytics } from "@vercel/analytics/next"
 import { Providers } from "@/components/Providers"
 import { Suspense } from "react"
+import { Toaster } from "sonner"
 import Navbar from "@/components/Navbar"
 import "./globals.css"
 
@@ -26,6 +27,7 @@ export default function RootLayout({
             {children}
           </Providers>
         </Suspense>
+        <Toaster theme="dark" position="top-right" />
         <Analytics />
       </body>
     </html>
