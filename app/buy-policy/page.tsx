@@ -7,7 +7,7 @@ import { useAccount, useReadContract, useWriteContract, useWaitForTransactionRec
 import { parseAbi, parseUnits } from "viem";
 
 const INSURANCE_POOL_ADDRESS = process.env.NEXT_PUBLIC_INSURANCE_POOL_ADDRESS as `0x${string}` || "0x59575D99d6691d109651C5bF357d78851dF90edB";
-const CUSD_ADDRESS = "0x4200000000000000000000000000000000000011"; // Sepolia cUSD
+const CUSD_ADDRESS = "0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1"; // Sepolia cUSD
 
 const erc20Abi = parseAbi([
   'function allowance(address owner, address spender) view returns (uint256)',
