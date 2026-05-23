@@ -10,7 +10,7 @@ import { LiveTVLChart } from "@/components/live-tvl-chart";
 
 const POLICY_NFT_ADDRESS = process.env.NEXT_PUBLIC_POLICY_NFT_ADDRESS as `0x${string}` || "0x4a2198F52f2E57047F21116Ed6Bb242600D8ce72";
 const INSURANCE_POOL_ADDRESS = process.env.NEXT_PUBLIC_INSURANCE_POOL_ADDRESS as `0x${string}` || "0x59575D99d6691d109651C5bF357d78851dF90edB";
-const CUSD_ALFAJORES_ADDRESS = "0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1";
+const CUSD_SEPOLIA_ADDRESS = "0x4200000000000000000000000000000000000011";
 const CELOSCAN_API_KEY = process.env.NEXT_PUBLIC_CELOSCAN_API_KEY || "A7PZRDK4NTCBJP99CI5KUVVG84UQVCMT2Z";
 
 const abi = parseAbi([
@@ -83,7 +83,7 @@ export default function AgentDashboardPage() {
 
   const { data: poolCUSDBalance } = useBalance({
     address: INSURANCE_POOL_ADDRESS,
-    token: CUSD_ALFAJORES_ADDRESS,
+    token: CUSD_SEPOLIA_ADDRESS,
   });
 
   const { data: blockNumber } = useBlockNumber({ watch: true });
@@ -99,10 +99,10 @@ export default function AgentDashboardPage() {
     const fetchHistory = async () => {
       try {
         setLoadingHistory(true);
-        const cusdRes = await fetch(`https://api-alfajores.celoscan.io/api?module=account&action=tokentx&address=${INSURANCE_POOL_ADDRESS}&page=1&offset=15&sort=desc&apikey=${CELOSCAN_API_KEY}`);
+        const cusdRes = await fetch(`https://api-sepolia.celoscan.io/api?module=account&action=tokentx&address=${INSURANCE_POOL_ADDRESS}&page=1&offset=15&sort=desc&apikey=${CELOSCAN_API_KEY}`);
         const cusdData = await cusdRes.json();
         
-        const nftRes = await fetch(`https://api-alfajores.celoscan.io/api?module=account&action=tokennfttx&address=${POLICY_NFT_ADDRESS}&page=1&offset=15&sort=desc&apikey=${CELOSCAN_API_KEY}`);
+        const nftRes = await fetch(`https://api-sepolia.celoscan.io/api?module=account&action=tokennfttx&address=${POLICY_NFT_ADDRESS}&page=1&offset=15&sort=desc&apikey=${CELOSCAN_API_KEY}`);
         const nftData = await nftRes.json();
 
         let combined: any[] = [];

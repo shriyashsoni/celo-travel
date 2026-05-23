@@ -7,7 +7,7 @@ import { useAccount, useReadContract, useWriteContract, useWaitForTransactionRec
 import { parseAbi, parseUnits } from "viem";
 
 const INSURANCE_POOL_ADDRESS = process.env.NEXT_PUBLIC_INSURANCE_POOL_ADDRESS as `0x${string}` || "0x59575D99d6691d109651C5bF357d78851dF90edB";
-const CUSD_ADDRESS = "0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1"; // Alfajores cUSD
+const CUSD_ADDRESS = "0x4200000000000000000000000000000000000011"; // Sepolia cUSD
 
 const erc20Abi = parseAbi([
   'function allowance(address owner, address spender) view returns (uint256)',
@@ -34,7 +34,7 @@ export default function BuyPolicyPage() {
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
   const { switchChain } = useSwitchChain();
-  const isCorrectChain = chainId === 44787; // Celo Alfajores Testnet ID
+  const isCorrectChain = chainId === 11142220; // Celo Sepolia Testnet ID
   
   const [flightNumber, setFlightNumber] = useState("");
   const [date, setDate] = useState("");
@@ -76,7 +76,7 @@ export default function BuyPolicyPage() {
     if (!isConnected) return;
     
     if (!isCorrectChain) {
-      switchChain({ chainId: 44787 });
+      switchChain({ chainId: 11142220 });
       return;
     }
 
@@ -227,7 +227,7 @@ export default function BuyPolicyPage() {
                 {!isConnected ? (
                   "Connect Wallet to Buy"
                 ) : !isCorrectChain ? (
-                  "Switch to Alfajores Testnet"
+                  "Switch to Sepolia Testnet"
                 ) : isPending || isTxConfirming ? (
                   <>
                     <Activity className="animate-spin" size={18} />
@@ -249,7 +249,7 @@ export default function BuyPolicyPage() {
                 {!isConnected ? (
                   <span className="text-white/40">Connect your Web3 wallet to begin</span>
                 ) : !isCorrectChain ? (
-                  <span className="text-red-400 font-medium">Wrong Network: MetaMask must be on Celo Alfajores</span>
+                  <span className="text-red-400 font-medium">Wrong Network: MetaMask must be on Celo Sepolia</span>
                 ) : needsApproval ? (
                   <span className="text-yellow-400/80">Step 1: Approve Token Spend</span>
                 ) : (
