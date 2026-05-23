@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createPublicClient, createWalletClient, http } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
-import { celoAlfajores } from 'viem/chains';
+import { celoSepolia } from 'viem/chains';
 
 const AVIATIONSTACK_API_KEY = process.env.AVIATIONSTACK_API_KEY;
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
