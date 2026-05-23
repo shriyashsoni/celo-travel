@@ -114,8 +114,7 @@ export default function BuyPolicyPage() {
       const data = await res.json();
       if (data.success) {
         setFlightData(data.flight);
-        if (data.flight.date) setDate(data.flight.date);
-        toast.success(`Found ${data.flight.airline} flight!`);
+        toast.success(`Tracking live telemetry for ${data.flight.airline}!`);
       } else {
         toast.error("Flight not found. Please check the flight number.");
       }
@@ -200,29 +199,44 @@ export default function BuyPolicyPage() {
               </div>
 
               {flightData && (
-                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="liquid-glass-strong border border-white/10 rounded-xl p-4 flex flex-col gap-3">
-                  <div className="flex justify-between items-center border-b border-white/10 pb-2">
-                    <span className="text-white/60 text-xs uppercase tracking-wider">Airline</span>
-                    <span className="font-semibold text-white">{flightData.airline}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <div className="flex flex-col">
-                      <span className="text-xl font-heading italic text-white">{flightData.departure?.iata || 'N/A'}</span>
-                      <span className="text-xs text-white/50">Departure</span>
+                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="liquid-glass-strong border border-white/10 rounded-xl p-5 flex flex-col gap-4 relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl"></div>
+                  
+                  <div className="flex justify-between items-center border-b border-white/10 pb-3 relative z-10">
+                    <div>
+                      <span className="text-white/60 text-[10px] uppercase tracking-widest block mb-0.5">Live Callsign</span>
+                      <span className="font-heading italic text-xl text-white">{flightData.airline}</span>
                     </div>
-                    <div className="flex-1 flex items-center justify-center px-4">
-                      <div className="w-full border-t border-dashed border-white/30 relative flex items-center justify-center">
-                        <Plane size={16} className="text-white/50 absolute" />
+                    <div className="flex flex-col items-end">
+                      <span className="text-white/60 text-[10px] uppercase tracking-widest block mb-0.5">Network Status</span>
+                      <div className="flex items-center gap-1.5 px-2 py-1 bg-green-500/20 rounded-md text-green-400 text-xs font-semibold">
+                        <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></div>
+                        {flightData.status}
                       </div>
                     </div>
-                    <div className="flex flex-col text-right">
-                      <span className="text-xl font-heading italic text-white">{flightData.arrival?.iata || 'N/A'}</span>
-                      <span className="text-xs text-white/50">Arrival</span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4 relative z-10">
+                    <div className="bg-black/30 rounded-lg p-3 border border-white/5">
+                      <span className="text-white/40 text-[10px] uppercase tracking-wider block mb-1">Current Altitude</span>
+                      <span className="font-mono text-sm text-white">{flightData.altitude}</span>
+                    </div>
+                    <div className="bg-black/30 rounded-lg p-3 border border-white/5">
+                      <span className="text-white/40 text-[10px] uppercase tracking-wider block mb-1">Ground Speed</span>
+                      <span className="font-mono text-sm text-white">{flightData.velocity}</span>
+                    </div>
+                    <div className="bg-black/30 rounded-lg p-3 border border-white/5">
+                      <span className="text-white/40 text-[10px] uppercase tracking-wider block mb-1">Origin Country</span>
+                      <span className="font-mono text-sm text-white">{flightData.country || 'Unknown'}</span>
+                    </div>
+                    <div className="bg-black/30 rounded-lg p-3 border border-white/5">
+                      <span className="text-white/40 text-[10px] uppercase tracking-wider block mb-1">Transponder ICAO24</span>
+                      <span className="font-mono text-sm text-white">{flightData.icao24}</span>
                     </div>
                   </div>
-                  <div className="flex justify-between items-center pt-2 border-t border-white/10 text-sm">
-                    <span className="text-white/60">Scheduled:</span>
-                    <span className="font-medium text-white">{flightData.departure?.scheduled ? new Date(flightData.departure.scheduled).toLocaleString() : 'Unknown'}</span>
+                  
+                  <div className="pt-2 text-[10px] text-white/30 text-center font-mono flex items-center justify-center gap-1">
+                    <Activity size={10} /> Live Telemetry from OpenSky Network
                   </div>
                 </motion.div>
               )}
