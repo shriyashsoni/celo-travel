@@ -110,38 +110,19 @@ export default function BuyPolicyPage() {
     setIsSearching(true);
     setFlightData(null);
     try {
-      // Fetch directly from the client to bypass Vercel server-side IP blocks
-      const res = await fetch("https://opensky-network.org/api/states/all");
-      const statesData = await res.json();
+      const res = await fetch(`/api/flight-search?flightId=${flightNumber}`);
+      const data = await res.json();
       
-      if (!statesData || !statesData.states) {
-        toast.error("OpenSky Network is busy. Please try again.");
-        setIsSearching(false);
-        return;
-      }
-
-      const flightState = statesData.states.find((s: any) => s[1] && s[1].trim().toUpperCase() === flightNumber.toUpperCase());
-
-      if (flightState) {
-        const altitude = flightState[7] !== null ? Math.round(flightState[7]) : 0;
-        const velocityMs = flightState[9] !== null ? flightState[9] : 0;
-        const velocityKmh = Math.round(velocityMs * 3.6);
-
-        setFlightData({
-          airline: flightState[1].trim(),
-          status: flightState[8] ? 'Grounded' : 'Airborne',
-          country: flightState[2],
-          altitude: `${altitude} meters`,
-          velocity: `${velocityKmh} km/h`,
-          icao24: flightState[0]
-        });
-        toast.success(`Tracking live telemetry for ${flightState[1].trim()}!`);
+      if (data.success) {
+        setFlightData(data.flight);
+        if (data.flight.date) setDate(data.flight.date);
+        toast.success(`Found real data for ${data.flight.airline}!`);
       } else {
-        toast.error("Flight not found! Ensure it is an active ICAO callsign (e.g. AAL2651).");
+        toast.error(data.error || "Flight not found.");
       }
     } catch (e) {
       console.error(e);
-      toast.error("Error connecting to OpenSky Network.");
+      toast.error("Error connecting to AviationStack API.");
     } finally {
       setIsSearching(false);
     }
@@ -226,39 +207,41 @@ export default function BuyPolicyPage() {
                   
                   <div className="flex justify-between items-center border-b border-white/10 pb-3 relative z-10">
                     <div>
-                      <span className="text-white/60 text-[10px] uppercase tracking-widest block mb-0.5">Live Callsign</span>
+                      <span className="text-white/60 text-[10px] uppercase tracking-widest block mb-0.5">Airline</span>
                       <span className="font-heading italic text-xl text-white">{flightData.airline}</span>
                     </div>
                     <div className="flex flex-col items-end">
-                      <span className="text-white/60 text-[10px] uppercase tracking-widest block mb-0.5">Network Status</span>
-                      <div className="flex items-center gap-1.5 px-2 py-1 bg-green-500/20 rounded-md text-green-400 text-xs font-semibold">
+                      <span className="text-white/60 text-[10px] uppercase tracking-widest block mb-0.5">Status</span>
+                      <div className="flex items-center gap-1.5 px-2 py-1 bg-green-500/20 rounded-md text-green-400 text-xs font-semibold capitalize">
                         <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></div>
                         {flightData.status}
                       </div>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4 relative z-10">
-                    <div className="bg-black/30 rounded-lg p-3 border border-white/5">
-                      <span className="text-white/40 text-[10px] uppercase tracking-wider block mb-1">Current Altitude</span>
-                      <span className="font-mono text-sm text-white">{flightData.altitude}</span>
+                  <div className="flex justify-between items-center relative z-10">
+                    <div className="flex flex-col">
+                      <span className="text-2xl font-heading italic text-white">{flightData.departureIata}</span>
+                      <span className="text-xs text-white/50 uppercase tracking-widest mt-1">Departure</span>
                     </div>
-                    <div className="bg-black/30 rounded-lg p-3 border border-white/5">
-                      <span className="text-white/40 text-[10px] uppercase tracking-wider block mb-1">Ground Speed</span>
-                      <span className="font-mono text-sm text-white">{flightData.velocity}</span>
+                    <div className="flex-1 flex items-center justify-center px-4">
+                      <div className="w-full border-t border-dashed border-white/30 relative flex items-center justify-center">
+                        <Plane size={20} className="text-white/50 absolute" />
+                      </div>
                     </div>
-                    <div className="bg-black/30 rounded-lg p-3 border border-white/5">
-                      <span className="text-white/40 text-[10px] uppercase tracking-wider block mb-1">Origin Country</span>
-                      <span className="font-mono text-sm text-white">{flightData.country || 'Unknown'}</span>
+                    <div className="flex flex-col text-right">
+                      <span className="text-2xl font-heading italic text-white">{flightData.arrivalIata}</span>
+                      <span className="text-xs text-white/50 uppercase tracking-widest mt-1">Arrival</span>
                     </div>
-                    <div className="bg-black/30 rounded-lg p-3 border border-white/5">
-                      <span className="text-white/40 text-[10px] uppercase tracking-wider block mb-1">Transponder ICAO24</span>
-                      <span className="font-mono text-sm text-white">{flightData.icao24}</span>
-                    </div>
+                  </div>
+
+                  <div className="flex justify-between items-center pt-3 border-t border-white/10 text-sm relative z-10">
+                    <span className="text-white/60">Scheduled Departure:</span>
+                    <span className="font-medium text-white">{flightData.scheduledTime ? new Date(flightData.scheduledTime).toLocaleString() : 'N/A'}</span>
                   </div>
                   
                   <div className="pt-2 text-[10px] text-white/30 text-center font-mono flex items-center justify-center gap-1">
-                    <Activity size={10} /> Live Telemetry from OpenSky Network
+                    <Activity size={10} /> Real data verified by AviationStack
                   </div>
                 </motion.div>
               )}
