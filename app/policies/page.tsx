@@ -56,9 +56,9 @@ function PolicyCard({ owner, index }: { owner: `0x${string}`; index: number }) {
   const [flightId, tier, expiry, isClaimed] = policy;
   
   const tierMap: Record<number, { label: string, payout: string }> = {
-    1: { label: "> 2 Hours Delay", payout: "5 cUSD" },
-    2: { label: "> 4 Hours Delay", payout: "15 cUSD" },
-    3: { label: "Cancelled", payout: "30 cUSD" },
+    1: { label: "> 1 Minute Delay", payout: "5 cUSD" },
+    2: { label: "> 5 Minutes Delay", payout: "15 cUSD" },
+    3: { label: "Flight Cancelled", payout: "30 cUSD" },
   };
 
   const coverage = tierMap[Number(tier)] || { label: "Unknown Tier", payout: "Unknown" };

@@ -290,9 +290,9 @@ export default function AgentDashboardPage() {
                   // Since I'm using DOM, I'll let the button read from a state. I should add `formTier` state.
                 }}
               >
-                <option value="1">Tier 1 - Flight Delay {'>'} 2h (5 cUSD)</option>
-                <option value="2">Tier 2 - Flight Delay {'>'} 4h (15 cUSD)</option>
-                <option value="3">Tier 3 - Cancellation (30 cUSD)</option>
+                <option value="1">Tier 1 - Flight Delay {'>'} 1m (0.50 cUSD)</option>
+                <option value="2">Tier 2 - Flight Delay {'>'} 5m (1.50 cUSD)</option>
+                <option value="3">Tier 3 - Cancellation (3.00 cUSD)</option>
               </select>
               <input 
                 type="text" 

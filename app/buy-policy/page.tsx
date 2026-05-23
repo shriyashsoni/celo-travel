@@ -44,9 +44,9 @@ export default function BuyPolicyPage() {
   const [txType, setTxType] = useState<'idle' | 'approving' | 'minting'>('idle');
 
   const tiers = [
-    { id: 1, delay: "> 2 Hours", premium: "0.50 cUSD", premiumValue: "0.5", payout: "$5 cUSD" },
-    { id: 2, delay: "> 4 Hours", premium: "1.50 cUSD", premiumValue: "1.5", payout: "$15 cUSD" },
-    { id: 3, delay: "Cancelled", premium: "3.00 cUSD", premiumValue: "3.0", payout: "$30 cUSD" },
+    { id: 1, delay: "> 1 Minute Delay", premium: "0.50 cUSD", premiumValue: "0.5", payout: "$5 cUSD" },
+    { id: 2, delay: "> 5 Minutes Delay", premium: "1.50 cUSD", premiumValue: "1.5", payout: "$15 cUSD" },
+    { id: 3, delay: "Flight Cancelled", premium: "3.00 cUSD", premiumValue: "3.0", payout: "$30 cUSD" },
   ];
 
   const selectedPremium = selectedTier ? tiers.find(t => t.id === selectedTier)?.premiumValue : "0";
@@ -87,37 +87,34 @@ export default function BuyPolicyPage() {
     }
   }, [isTxSuccess, txType, refetchAllowance]);
 
-  const handleTransaction = () => {
+  const handleApprove = () => {
     if (!isConnected) return;
-    
-    if (!isCorrectChain) {
-      switchChain({ chainId: 11142220 });
-      return;
-    }
-
+    if (!isCorrectChain) { switchChain({ chainId: 11142220 }); return; }
     if (!flightNumber || !date || !selectedTier) return;
+    setTxType('approving');
+    writeContract({
+      address: CUSD_ADDRESS,
+      abi: erc20Abi,
+      functionName: 'approve',
+      args: [INSURANCE_POOL_ADDRESS, premiumInWei],
+    });
+  };
 
-    if (needsApproval) {
-      setTxType('approving');
-      writeContract({
-        address: CUSD_ADDRESS,
-        abi: erc20Abi,
-        functionName: 'approve',
-        args: [INSURANCE_POOL_ADDRESS, premiumInWei],
-      });
-    } else {
-      setTxType('minting');
-      const flightDate = new Date(date);
-      // Expiry is set to 24 hours after flight date
-      const expiryTimestamp = Math.floor(flightDate.getTime() / 1000) + 86400; 
-      
-      writeContract({
-        address: INSURANCE_POOL_ADDRESS,
-        abi: poolAbi,
-        functionName: 'buyPolicy',
-        args: [flightNumber, selectedTier, BigInt(expiryTimestamp)],
-      });
-    }
+  const handleMint = () => {
+    if (!isConnected) return;
+    if (!isCorrectChain) { switchChain({ chainId: 11142220 }); return; }
+    if (!flightNumber || !date || !selectedTier) return;
+    setTxType('minting');
+    const flightDate = new Date(date);
+    // Expiry is set to 24 hours after flight date
+    const expiryTimestamp = Math.floor(flightDate.getTime() / 1000) + 86400; 
+    
+    writeContract({
+      address: INSURANCE_POOL_ADDRESS,
+      abi: poolAbi,
+      functionName: 'buyPolicy',
+      args: [flightNumber, selectedTier, BigInt(expiryTimestamp)],
+    });
   };
 
   if (!mounted) return null;
@@ -232,47 +229,59 @@ export default function BuyPolicyPage() {
                 </span>
               </div>
               
-              <button 
-                onClick={handleTransaction}
-                disabled={(isConnected && isCorrectChain && (!flightNumber || !date || !selectedTier)) || isPending || isTxConfirming}
-                className={`w-full py-4 rounded-full font-medium text-black transition-all flex items-center justify-center gap-2 ${
-                  !isConnected ? "bg-white hover:bg-white/90" : 
-                  !isCorrectChain ? "bg-red-500 hover:bg-red-400 text-white shadow-[0_0_15px_rgba(239,68,68,0.4)]" :
-                  needsApproval ? "bg-yellow-400 hover:bg-yellow-300" : "bg-white hover:bg-white/90"
-                } disabled:opacity-50 disabled:cursor-not-allowed`}
-              >
+              <div className="flex flex-col gap-3">
                 {!isConnected ? (
-                  "Connect Wallet to Buy"
+                  <button onClick={() => {}} className="w-full py-4 rounded-full font-medium text-black transition-all flex items-center justify-center gap-2 bg-white hover:bg-white/90">
+                    Connect Wallet to Buy
+                  </button>
                 ) : !isCorrectChain ? (
-                  "Switch to Sepolia Testnet"
-                ) : isPending || isTxConfirming ? (
-                  <>
-                    <Activity className="animate-spin" size={18} />
-                    {txType === 'approving' ? "Approving cUSD..." : "Minting Policy..."}
-                  </>
-                ) : isTxSuccess && txType === 'minting' ? (
-                  <>
-                    <CheckCircle size={18} />
-                    Policy Minted! 🎉
-                  </>
-                ) : needsApproval ? (
-                  "Approve cUSD"
+                  <button onClick={() => switchChain({ chainId: 11142220 })} className="w-full py-4 rounded-full font-medium text-white transition-all flex items-center justify-center gap-2 bg-red-500 hover:bg-red-400 shadow-[0_0_15px_rgba(239,68,68,0.4)]">
+                    Switch to Sepolia Testnet
+                  </button>
                 ) : (
-                  "Pay & Mint Policy NFT"
+                  <>
+                    <button 
+                      onClick={handleApprove}
+                      disabled={!flightNumber || !date || !selectedTier || !needsApproval || (isPending && txType === 'approving') || (isTxConfirming && txType === 'approving')}
+                      className={`w-full py-4 rounded-full font-medium transition-all flex items-center justify-center gap-2 ${
+                        !needsApproval ? "bg-green-500/20 text-green-400 border border-green-500/50" : 
+                        "bg-yellow-400 hover:bg-yellow-300 text-black"
+                      } disabled:opacity-50 disabled:cursor-not-allowed`}
+                    >
+                      {isPending && txType === 'approving' || isTxConfirming && txType === 'approving' ? (
+                        <><Activity className="animate-spin" size={18} /> Approving cUSD...</>
+                      ) : !needsApproval ? (
+                        <><CheckCircle size={18} /> cUSD Approved</>
+                      ) : (
+                        "Step 1: Approve cUSD"
+                      )}
+                    </button>
+                    
+                    <button 
+                      onClick={handleMint}
+                      disabled={!flightNumber || !date || !selectedTier || needsApproval || (isPending && txType === 'minting') || (isTxConfirming && txType === 'minting') || (isTxSuccess && txType === 'minting')}
+                      className={`w-full py-4 rounded-full font-medium transition-all flex items-center justify-center gap-2 ${
+                        (isTxSuccess && txType === 'minting') ? "bg-green-500 text-white shadow-[0_0_15px_rgba(34,197,94,0.4)]" :
+                        "bg-white hover:bg-white/90 text-black"
+                      } disabled:opacity-50 disabled:cursor-not-allowed`}
+                    >
+                      {isPending && txType === 'minting' || isTxConfirming && txType === 'minting' ? (
+                        <><Activity className="animate-spin" size={18} /> Minting Policy...</>
+                      ) : (isTxSuccess && txType === 'minting') ? (
+                        <><CheckCircle size={18} /> Policy Minted Successfully! 🎉</>
+                      ) : (
+                        "Step 2: Pay & Mint Policy NFT"
+                      )}
+                    </button>
+                  </>
                 )}
-              </button>
+              </div>
 
-              <div className="mt-4 flex items-center justify-center gap-2 text-xs">
-                {!isConnected ? (
-                  <span className="text-white/40">Connect your Web3 wallet to begin</span>
-                ) : !isCorrectChain ? (
-                  <span className="text-red-400 font-medium">Wrong Network: MetaMask must be on Celo Sepolia</span>
-                ) : isTxSuccess && txType === 'minting' ? (
-                  <span className="text-green-400 font-medium">Success! Policy registered on-chain.</span>
-                ) : needsApproval ? (
-                  <span className="text-yellow-400/80">Step 1: Approve Token Spend</span>
-                ) : (
-                  <span className="text-green-400/80">Step 2: Mint Policy NFT</span>
+              <div className="mt-6 flex flex-col items-center justify-center gap-2 text-sm">
+                {(isTxSuccess && txType === 'minting' && txHash) && (
+                  <a href={`https://celoscan.io/tx/${txHash}`} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 underline underline-offset-4 flex items-center gap-1">
+                    View Transaction on CeloScan
+                  </a>
                 )}
               </div>
 
