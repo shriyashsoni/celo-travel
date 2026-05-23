@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Activity, ShieldCheck, Database, Bot, ArrowRightLeft, History, ExternalLink, BrainCircuit } from "lucide-react";
-import { useReadContract, useAccount, useBalance, useBlockNumber } from "wagmi";
+import { useReadContract, useAccount, useBalance, useBlockNumber, useWriteContract } from "wagmi";
 import { parseAbi, formatUnits } from "viem";
 import { PolicyOverview } from "@/components/policy-overview";
 import { LiveTVLChart } from "@/components/live-tvl-chart";
@@ -51,8 +51,7 @@ export default function AgentDashboardPage() {
   
   useEffect(() => setMounted(true), []);
 
-  // @ts-ignore
-  const { writeContract, isPending, isSuccess } = typeof window !== 'undefined' ? require('wagmi').useWriteContract() : { writeContract: null, isPending: false, isSuccess: false };
+  const { writeContract, isPending, isSuccess } = useWriteContract();
   
   // Real On-Chain Reads
   const { data: totalSupplyRaw } = useReadContract({
@@ -155,7 +154,7 @@ export default function AgentDashboardPage() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (passwordInput === "admin123") {
+    if (passwordInput === "Soni#2023") {
       setIsAuthenticated(true);
       setAuthError("");
     } else {
