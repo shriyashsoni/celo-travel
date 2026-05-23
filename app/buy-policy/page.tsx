@@ -110,16 +110,38 @@ export default function BuyPolicyPage() {
     setIsSearching(true);
     setFlightData(null);
     try {
-      const res = await fetch(`/api/flight-search?flightId=${flightNumber}`);
-      const data = await res.json();
-      if (data.success) {
-        setFlightData(data.flight);
-        toast.success(`Tracking live telemetry for ${data.flight.airline}!`);
+      // Fetch directly from the client to bypass Vercel server-side IP blocks
+      const res = await fetch("https://opensky-network.org/api/states/all");
+      const statesData = await res.json();
+      
+      if (!statesData || !statesData.states) {
+        toast.error("OpenSky Network is busy. Please try again.");
+        setIsSearching(false);
+        return;
+      }
+
+      const flightState = statesData.states.find((s: any) => s[1] && s[1].trim().toUpperCase() === flightNumber.toUpperCase());
+
+      if (flightState) {
+        const altitude = flightState[7] !== null ? Math.round(flightState[7]) : 0;
+        const velocityMs = flightState[9] !== null ? flightState[9] : 0;
+        const velocityKmh = Math.round(velocityMs * 3.6);
+
+        setFlightData({
+          airline: flightState[1].trim(),
+          status: flightState[8] ? 'Grounded' : 'Airborne',
+          country: flightState[2],
+          altitude: `${altitude} meters`,
+          velocity: `${velocityKmh} km/h`,
+          icao24: flightState[0]
+        });
+        toast.success(`Tracking live telemetry for ${flightState[1].trim()}!`);
       } else {
-        toast.error("Flight not found. Please check the flight number.");
+        toast.error("Flight not found! Ensure it is an active ICAO callsign (e.g. AAL2651).");
       }
     } catch (e) {
-      toast.error("Error searching for flight data.");
+      console.error(e);
+      toast.error("Error connecting to OpenSky Network.");
     } finally {
       setIsSearching(false);
     }
