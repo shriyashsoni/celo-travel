@@ -41,6 +41,10 @@ export default function BuyPolicyPage() {
   const [date, setDate] = useState("");
   const [selectedTier, setSelectedTier] = useState<number | null>(null);
   
+  // Flight Search State
+  const [isSearching, setIsSearching] = useState(false);
+  const [flightData, setFlightData] = useState<any>(null);
+  
   // Track transaction steps to separate Approval success from Purchase success
   const [txType, setTxType] = useState<'idle' | 'approving' | 'minting'>('idle');
 
@@ -101,6 +105,27 @@ export default function BuyPolicyPage() {
     }
   }, [isTxSuccess, txType, refetchAllowance]);
 
+  const searchFlight = async () => {
+    if (!flightNumber) return;
+    setIsSearching(true);
+    setFlightData(null);
+    try {
+      const res = await fetch(`/api/flight-search?flightId=${flightNumber}`);
+      const data = await res.json();
+      if (data.success) {
+        setFlightData(data.flight);
+        if (data.flight.date) setDate(data.flight.date);
+        toast.success(`Found ${data.flight.airline} flight!`);
+      } else {
+        toast.error("Flight not found. Please check the flight number.");
+      }
+    } catch (e) {
+      toast.error("Error searching for flight data.");
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
   const handleApprove = () => {
     if (!isConnected) return;
     if (!isCorrectChain) { switchChain({ chainId: 11142220 }); return; }
@@ -154,16 +179,54 @@ export default function BuyPolicyPage() {
             </div>
             
             <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-white/70 mb-2">Flight Number</label>
-                <input 
-                  type="text" 
-                  className="w-full liquid-glass bg-transparent border-none rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:ring-1 focus:ring-white/50 transition-all uppercase"
-                  placeholder="e.g. AA123"
-                  value={flightNumber}
-                  onChange={(e) => setFlightNumber(e.target.value.toUpperCase())}
-                />
+              <div className="flex gap-3 items-end">
+                <div className="flex-1">
+                  <label className="block text-sm font-medium text-white/70 mb-2">Flight Number</label>
+                  <input 
+                    type="text" 
+                    className="w-full liquid-glass bg-transparent border-none rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:ring-1 focus:ring-white/50 transition-all uppercase"
+                    placeholder="e.g. AA123"
+                    value={flightNumber}
+                    onChange={(e) => { setFlightNumber(e.target.value.toUpperCase()); setFlightData(null); }}
+                  />
+                </div>
+                <button 
+                  onClick={searchFlight}
+                  disabled={isSearching || !flightNumber}
+                  className="bg-white text-black px-6 py-3 rounded-xl font-medium hover:bg-white/90 transition-all disabled:opacity-50 h-[48px] flex items-center justify-center min-w-[100px]"
+                >
+                  {isSearching ? <Activity size={18} className="animate-spin" /> : "Search"}
+                </button>
               </div>
+
+              {flightData && (
+                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="liquid-glass-strong border border-white/10 rounded-xl p-4 flex flex-col gap-3">
+                  <div className="flex justify-between items-center border-b border-white/10 pb-2">
+                    <span className="text-white/60 text-xs uppercase tracking-wider">Airline</span>
+                    <span className="font-semibold text-white">{flightData.airline}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <div className="flex flex-col">
+                      <span className="text-xl font-heading italic text-white">{flightData.departure?.iata || 'N/A'}</span>
+                      <span className="text-xs text-white/50">Departure</span>
+                    </div>
+                    <div className="flex-1 flex items-center justify-center px-4">
+                      <div className="w-full border-t border-dashed border-white/30 relative flex items-center justify-center">
+                        <Plane size={16} className="text-white/50 absolute" />
+                      </div>
+                    </div>
+                    <div className="flex flex-col text-right">
+                      <span className="text-xl font-heading italic text-white">{flightData.arrival?.iata || 'N/A'}</span>
+                      <span className="text-xs text-white/50">Arrival</span>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center pt-2 border-t border-white/10 text-sm">
+                    <span className="text-white/60">Scheduled:</span>
+                    <span className="font-medium text-white">{flightData.departure?.scheduled ? new Date(flightData.departure.scheduled).toLocaleString() : 'Unknown'}</span>
+                  </div>
+                </motion.div>
+              )}
+
               <div>
                 <label className="block text-sm font-medium text-white/70 mb-2">Departure Date</label>
                 <input 
