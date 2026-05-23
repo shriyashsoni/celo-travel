@@ -61,7 +61,9 @@ export default function BuyPolicyPage() {
     query: { enabled: !!address && isCorrectChain },
   });
 
-  const needsApproval = isCorrectChain && (allowance === undefined || (allowance as bigint) < premiumInWei);
+  const [isApprovedLocal, setIsApprovedLocal] = useState(false);
+
+  const needsApproval = isCorrectChain && !isApprovedLocal && (allowance === undefined || (allowance as bigint) < premiumInWei);
 
   const { writeContract, data: txHash, isPending } = useWriteContract();
 
@@ -70,22 +72,14 @@ export default function BuyPolicyPage() {
   });
 
   useEffect(() => {
-    if (txHash) {
-      if (txType === 'approving') {
-        const timer = setTimeout(() => {
-          setTxType('idle');
-          refetchAllowance();
-        }, 2000);
-        return () => clearTimeout(timer);
-      }
-    }
-  }, [txHash, txType, refetchAllowance]);
-
-  useEffect(() => {
     if (isTxSuccess) {
+      if (txType === 'approving') {
+        setIsApprovedLocal(true);
+        setTxType('idle');
+      }
       refetchAllowance();
     }
-  }, [isTxSuccess, refetchAllowance]);
+  }, [isTxSuccess, txType, refetchAllowance]);
 
   const handleTransaction = () => {
     if (!isConnected) return;
