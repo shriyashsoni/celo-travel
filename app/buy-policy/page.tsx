@@ -411,10 +411,22 @@ export default function BuyPolicyPage() {
                 )}
               </div>
 
-              <div className="mt-6 flex flex-col items-center justify-center gap-2 text-sm">
+              <div className="mt-6 flex flex-col items-center justify-center gap-4 text-sm w-full">
                 {(txHash && txType === 'minting') && (
                   <a href={`https://celo-alfajores.blockscout.com/tx/${txHash}`} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 underline underline-offset-4 flex items-center gap-1">
                     {isTxConfirming ? "View Pending Tx on Block Explorer" : "View Confirmed Tx on Block Explorer"}
+                  </a>
+                )}
+                
+                {(isTxSuccess && txType === 'minting' && txHash) && (
+                  <a 
+                    href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`Just secured my flight ${flightNumber} on-chain with TravelShield! 🛡️✈️\n\n🔗 Transaction: https://celo-alfajores.blockscout.com/tx/${txHash}\n\nGet your own autonomous flight insurance at: https://celo-travel.vercel.app\n\n#TravelShield #Celo #Web3 #BuildOnCelo`)}`}
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="w-full py-3 rounded-full bg-[#1DA1F2]/10 hover:bg-[#1DA1F2]/20 border border-[#1DA1F2]/50 text-[#1DA1F2] font-medium text-center text-sm flex items-center justify-center gap-2 transition-all mt-2"
+                  >
+                    <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                    Share on X
                   </a>
                 )}
               </div>
