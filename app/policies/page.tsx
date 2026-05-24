@@ -117,7 +117,7 @@ function PolicyCard({ owner, index }: { owner: `0x${string}`; index: number }) {
 
       <div className="mt-4">
         <a 
-          href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`Just secured my flight ${flightId} on-chain with TravelShield! 🛡️✈️\n\n📜 Policy NFT: ${POLICY_NFT_ADDRESS}\n🎫 Token ID: #${tokenId}\n\nCheck out the repo: https://github.com/shriyashsoni/celo-travel\n\n#TravelShield #Celo #Web3 #BuildOnCelo`)}`}
+          href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`Just secured my flight ${flightId} on-chain with TravelShield! 🛡️✈️\n\n📜 Policy NFT: ${POLICY_NFT_ADDRESS}\n🎫 Token ID: #${tokenId}\n\nGet your own autonomous flight insurance at: https://celo-travel.vercel.app\n\n#TravelShield #Celo #Web3 #BuildOnCelo`)}`}
           target="_blank" 
           rel="noopener noreferrer"
           className="w-full py-3 rounded-full border border-white/20 hover:bg-white/10 text-white font-medium text-center text-sm flex items-center justify-center gap-2 transition-all"
