@@ -12,7 +12,7 @@ const POLICY_NFT_ADDRESS = ("0xb37d83B8f7260b83aAc7013c2c09b329eE37986C" as stri
 const abi = parseAbi([
   'function balanceOf(address owner) external view returns (uint256)',
   'function tokenOfOwnerByIndex(address owner, uint256 index) external view returns (uint256)',
-  'function getPolicy(uint256 tokenId) external view returns (string flightId, uint8 tier, uint256 expiry, bool isClaimed)'
+  'function getPolicy(uint256 tokenId) external view returns ((string flightId, uint8 tier, uint256 expiry, bool isClaimed))'
 ]);
 
 const fadeUp = {
@@ -53,7 +53,10 @@ function PolicyCard({ owner, index }: { owner: `0x${string}`; index: number }) {
     );
   }
 
-  const [flightId, tier, expiry, isClaimed] = policy;
+  const flightId = (policy as any).flightId || (policy as any)[0];
+  const tier = (policy as any).tier !== undefined ? (policy as any).tier : (policy as any)[1];
+  const expiry = (policy as any).expiry !== undefined ? (policy as any).expiry : (policy as any)[2];
+  const isClaimed = (policy as any).isClaimed !== undefined ? (policy as any).isClaimed : (policy as any)[3];
   
   const tierMap: Record<number, { label: string, payout: string }> = {
     1: { label: "> 1 Minute Delay", payout: "5 cUSD" },
