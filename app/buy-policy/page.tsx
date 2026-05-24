@@ -41,6 +41,8 @@ export default function BuyPolicyPage() {
   
   const [flightNumber, setFlightNumber] = useState("");
   const [date, setDate] = useState("");
+  const [passengerName, setPassengerName] = useState("");
+  const [passengerEmail, setPassengerEmail] = useState("");
   const [selectedTier, setSelectedTier] = useState<number | null>(null);
   
   // Flight Search State
@@ -125,6 +127,16 @@ export default function BuyPolicyPage() {
         setTxType('idle');
       } else if (txType === 'minting') {
         toast.success("Policy Minted successfully!");
+        if (txHash) {
+          localStorage.setItem(`policy_${txHash}`, JSON.stringify({
+            flightNumber,
+            date,
+            tier: selectedTier,
+            passengerName,
+            passengerEmail,
+            timestamp: Date.now()
+          }));
+        }
       }
       refetchAllowance();
     }
@@ -281,6 +293,29 @@ export default function BuyPolicyPage() {
                   onChange={(e) => setDate(e.target.value)}
                 />
               </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-white/70 mb-2">Passenger Name</label>
+                  <input 
+                    type="text" 
+                    className="w-full liquid-glass bg-transparent border-none rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:ring-1 focus:ring-white/50 transition-all"
+                    placeholder="John Doe"
+                    value={passengerName}
+                    onChange={(e) => setPassengerName(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-white/70 mb-2">Email Address</label>
+                  <input 
+                    type="email" 
+                    className="w-full liquid-glass bg-transparent border-none rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:ring-1 focus:ring-white/50 transition-all"
+                    placeholder="john@example.com"
+                    value={passengerEmail}
+                    onChange={(e) => setPassengerEmail(e.target.value)}
+                  />
+                </div>
+              </div>
             </div>
 
             <div className="flex items-center gap-3 mb-6 mt-10 border-b border-white/10 pb-4">
@@ -372,7 +407,7 @@ export default function BuyPolicyPage() {
                   <>
                     <button 
                       onClick={handleApprove}
-                      disabled={!flightNumber || !date || !selectedTier || !needsApproval || (isPending && txType === 'approving') || (isTxConfirming && txType === 'approving')}
+                      disabled={!flightNumber || !date || !passengerName || !passengerEmail || !selectedTier || !needsApproval || (isPending && txType === 'approving') || (isTxConfirming && txType === 'approving')}
                       className={`w-full py-4 rounded-full font-medium transition-all flex items-center justify-center gap-2 ${
                         !needsApproval ? "bg-green-500/20 text-green-400 border border-green-500/50" : 
                         "bg-yellow-400 hover:bg-yellow-300 text-black"
@@ -391,7 +426,7 @@ export default function BuyPolicyPage() {
                     
                     <button 
                       onClick={handleMint}
-                      disabled={!flightNumber || !date || !selectedTier || needsApproval || (isPending && txType === 'minting') || (isTxConfirming && txType === 'minting') || (isTxSuccess && txType === 'minting')}
+                      disabled={!flightNumber || !date || !passengerName || !passengerEmail || !selectedTier || needsApproval || (isPending && txType === 'minting') || (isTxConfirming && txType === 'minting') || (isTxSuccess && txType === 'minting')}
                       className={`w-full py-4 rounded-full font-medium transition-all flex items-center justify-center gap-2 ${
                         (isTxSuccess && txType === 'minting') ? "bg-green-500 text-white shadow-[0_0_15px_rgba(34,197,94,0.4)]" :
                         "bg-white hover:bg-white/90 text-black"
@@ -419,15 +454,23 @@ export default function BuyPolicyPage() {
                 )}
                 
                 {(isTxSuccess && txType === 'minting' && txHash) && (
-                  <a 
-                    href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`Just secured my flight ${flightNumber} on-chain with TravelShield! 🛡️✈️\n\n🔗 Transaction: https://celo-alfajores.blockscout.com/tx/${txHash}\n\nGet your own autonomous flight insurance at: https://celo-travel.vercel.app\n\n#TravelShield #Celo #Web3 #BuildOnCelo`)}`}
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="w-full py-3 rounded-full bg-[#1DA1F2]/10 hover:bg-[#1DA1F2]/20 border border-[#1DA1F2]/50 text-[#1DA1F2] font-medium text-center text-sm flex items-center justify-center gap-2 transition-all mt-2"
-                  >
-                    <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-                    Share on X
-                  </a>
+                  <>
+                    <a 
+                      href={`/certificate/${txHash}`}
+                      className="w-full py-3 rounded-full bg-white/10 hover:bg-white/20 border border-white/30 text-white font-medium text-center text-sm flex items-center justify-center gap-2 transition-all mt-2"
+                    >
+                      📄 View & Download Policy Certificate
+                    </a>
+                    <a 
+                      href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`Just secured my flight ${flightNumber} on-chain with TravelShield! 🛡️✈️\n\n🔗 Transaction: https://celo-alfajores.blockscout.com/tx/${txHash}\n\nGet your own autonomous flight insurance at: https://celo-travel.vercel.app\n\n#TravelShield #Celo #Web3 #BuildOnCelo`)}`}
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="w-full py-3 rounded-full bg-[#1DA1F2]/10 hover:bg-[#1DA1F2]/20 border border-[#1DA1F2]/50 text-[#1DA1F2] font-medium text-center text-sm flex items-center justify-center gap-2 transition-all"
+                    >
+                      <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                      Share on X
+                    </a>
+                  </>
                 )}
               </div>
 
