@@ -88,10 +88,10 @@ export default function BuyPolicyPage() {
       address: CUSD_ADDRESS,
       abi: erc20Abi,
       functionName: 'mint',
-      args: [address as `0x${string}`, parseUnits("100", 18)],
+      args: [address as `0x${string}`, parseUnits("5", 18)],
     }, {
       onSuccess: () => {
-        toast.success("100 Test cUSD Minted! Please wait for block confirmation.");
+        toast.success("5 Test cUSD Minted! Please wait for block confirmation.");
         setTimeout(() => refetchBalance(), 3000);
       }
     });
@@ -355,7 +355,7 @@ export default function BuyPolicyPage() {
                   <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 mb-2">
                     <p className="text-red-400 text-xs text-center mb-2">You don't have enough Test cUSD!</p>
                     <button onClick={handleFaucet} className="w-full py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg text-sm font-medium transition-colors border border-red-500/30">
-                      Faucet: Get 100 Test cUSD
+                      Faucet: Get 5 Test cUSD
                     </button>
                   </div>
                 )}
