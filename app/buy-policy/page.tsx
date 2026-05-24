@@ -7,12 +7,14 @@ import { useAccount, useReadContract, useWriteContract, useWaitForTransactionRec
 import { parseAbi, parseUnits } from "viem";
 import { toast } from "sonner";
 
-const INSURANCE_POOL_ADDRESS = process.env.NEXT_PUBLIC_INSURANCE_POOL_ADDRESS as `0x${string}` || "0x78bf048E450Ec94cB055C8ab180CA27c912e975e";
-const CUSD_ADDRESS = "0x82fc23020f1cf58EA47d4a0dDDc2F8C42BE65705"; // Sepolia cUSD
+const INSURANCE_POOL_ADDRESS = ("0x89FDD0Ad4bd2B2c48ECB39A6f636Af000F56Abe6" as string).trim() as `0x${string}`;
+const CUSD_ADDRESS = ("0x666a2c9a052203F53B2576a984bCC0BFa539417F" as string).trim() as `0x${string}`; // Sepolia cUSD
 
 const erc20Abi = parseAbi([
   'function allowance(address owner, address spender) view returns (uint256)',
-  'function approve(address spender, uint256 amount) returns (bool)'
+  'function approve(address spender, uint256 amount) returns (bool)',
+  'function balanceOf(address account) view returns (uint256)',
+  'function mint(address to, uint256 amount)'
 ]);
 
 const poolAbi = parseAbi([
@@ -68,9 +70,32 @@ export default function BuyPolicyPage() {
 
   const [isApprovedLocal, setIsApprovedLocal] = useState(false);
 
+  const { data: cusdBalance, refetch: refetchBalance } = useReadContract({
+    address: CUSD_ADDRESS,
+    abi: erc20Abi,
+    functionName: 'balanceOf',
+    args: [address as `0x${string}`],
+    query: { enabled: !!address && isCorrectChain },
+  });
+
   const needsApproval = isCorrectChain && !isApprovedLocal && (allowance === undefined || (allowance as bigint) < premiumInWei);
 
   const { writeContract, data: txHash, isPending, error } = useWriteContract();
+
+  const handleFaucet = () => {
+    if (!isConnected || !isCorrectChain) return;
+    writeContract({
+      address: CUSD_ADDRESS,
+      abi: erc20Abi,
+      functionName: 'mint',
+      args: [address as `0x${string}`, parseUnits("100", 18)],
+    }, {
+      onSuccess: () => {
+        toast.success("100 Test cUSD Minted! Please wait for block confirmation.");
+        setTimeout(() => refetchBalance(), 3000);
+      }
+    });
+  };
 
   const { isLoading: isTxConfirming, isSuccess: isTxSuccess, isError: isTxError, error: txReceiptError } = useWaitForTransactionReceipt({
     hash: txHash,
@@ -79,7 +104,7 @@ export default function BuyPolicyPage() {
   useEffect(() => {
     if (error) {
       console.error(error);
-      toast.error("Transaction failed: " + (error as any).shortMessage || error.message);
+      toast.error("Transaction failed: " + ((error as any).shortMessage ? (error as any).shortMessage : error.message));
       setTxType('idle');
     }
   }, [error]);
@@ -326,6 +351,15 @@ export default function BuyPolicyPage() {
               </div>
               
               <div className="flex flex-col gap-3">
+                {isConnected && isCorrectChain && cusdBalance !== undefined && (cusdBalance as bigint) < parseUnits("3", 18) && (
+                  <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 mb-2">
+                    <p className="text-red-400 text-xs text-center mb-2">You don't have enough Test cUSD!</p>
+                    <button onClick={handleFaucet} className="w-full py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg text-sm font-medium transition-colors border border-red-500/30">
+                      Faucet: Get 100 Test cUSD
+                    </button>
+                  </div>
+                )}
+                
                 {!isConnected ? (
                   <button onClick={() => {}} className="w-full py-4 rounded-full font-medium text-black transition-all flex items-center justify-center gap-2 bg-white hover:bg-white/90">
                     Connect Wallet to Buy
@@ -344,8 +378,10 @@ export default function BuyPolicyPage() {
                         "bg-yellow-400 hover:bg-yellow-300 text-black"
                       } disabled:opacity-50 disabled:cursor-not-allowed`}
                     >
-                      {isPending && txType === 'approving' || isTxConfirming && txType === 'approving' ? (
-                        <><Activity className="animate-spin" size={18} /> Approving cUSD...</>
+                      {isPending && txType === 'approving' ? (
+                        <><Activity className="animate-spin" size={18} /> Check Wallet Popup...</>
+                      ) : isTxConfirming && txType === 'approving' ? (
+                        <><Activity className="animate-spin" size={18} /> Confirming on Chain...</>
                       ) : !needsApproval ? (
                         <><CheckCircle size={18} /> cUSD Approved</>
                       ) : (
@@ -361,8 +397,10 @@ export default function BuyPolicyPage() {
                         "bg-white hover:bg-white/90 text-black"
                       } disabled:opacity-50 disabled:cursor-not-allowed`}
                     >
-                      {isPending && txType === 'minting' || isTxConfirming && txType === 'minting' ? (
-                        <><Activity className="animate-spin" size={18} /> Minting Policy...</>
+                      {isPending && txType === 'minting' ? (
+                        <><Activity className="animate-spin" size={18} /> Check Wallet Popup...</>
+                      ) : isTxConfirming && txType === 'minting' ? (
+                        <><Activity className="animate-spin" size={18} /> Confirming on Chain...</>
                       ) : (isTxSuccess && txType === 'minting') ? (
                         <><CheckCircle size={18} /> Policy Minted Successfully! 🎉</>
                       ) : (
@@ -374,9 +412,9 @@ export default function BuyPolicyPage() {
               </div>
 
               <div className="mt-6 flex flex-col items-center justify-center gap-2 text-sm">
-                {(isTxSuccess && txType === 'minting' && txHash) && (
-                  <a href={`https://celoscan.io/tx/${txHash}`} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 underline underline-offset-4 flex items-center gap-1">
-                    View Transaction on CeloScan
+                {(txHash && txType === 'minting') && (
+                  <a href={`https://celo-alfajores.blockscout.com/tx/${txHash}`} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 underline underline-offset-4 flex items-center gap-1">
+                    {isTxConfirming ? "View Pending Tx on Block Explorer" : "View Confirmed Tx on Block Explorer"}
                   </a>
                 )}
               </div>

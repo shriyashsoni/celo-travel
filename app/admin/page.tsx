@@ -8,9 +8,9 @@ import { parseAbi, formatUnits } from "viem";
 import { PolicyOverview } from "@/components/policy-overview";
 import { LiveTVLChart } from "@/components/live-tvl-chart";
 
-const POLICY_NFT_ADDRESS = process.env.NEXT_PUBLIC_POLICY_NFT_ADDRESS as `0x${string}` || "0x48Bd564c86e379D08D5b536c766b65b966548Ab1";
-const INSURANCE_POOL_ADDRESS = process.env.NEXT_PUBLIC_INSURANCE_POOL_ADDRESS as `0x${string}` || "0x78bf048E450Ec94cB055C8ab180CA27c912e975e";
-const CUSD_SEPOLIA_ADDRESS = "0x954cBA141f21760751E3065ACC250c38fb9f5e61";
+const POLICY_NFT_ADDRESS = ("0xb37d83B8f7260b83aAc7013c2c09b329eE37986C" as string).trim() as `0x${string}`;
+const INSURANCE_POOL_ADDRESS = ("0x89FDD0Ad4bd2B2c48ECB39A6f636Af000F56Abe6" as string).trim() as `0x${string}`;
+const CUSD_SEPOLIA_ADDRESS = ("0x666a2c9a052203F53B2576a984bCC0BFa539417F" as string).trim() as `0x${string}`;
 const CELOSCAN_API_KEY = process.env.NEXT_PUBLIC_CELOSCAN_API_KEY || "A7PZRDK4NTCBJP99CI5KUVVG84UQVCMT2Z";
 
 const abi = parseAbi([
@@ -99,10 +99,10 @@ export default function AgentDashboardPage() {
     const fetchHistory = async () => {
       try {
         setLoadingHistory(true);
-        const cusdRes = await fetch(`https://api-sepolia.celoscan.io/api?module=account&action=tokentx&address=${INSURANCE_POOL_ADDRESS}&page=1&offset=15&sort=desc&apikey=${CELOSCAN_API_KEY}`);
+        const cusdRes = await fetch(`https://celo-alfajores.blockscout.com/api?module=account&action=tokentx&address=${INSURANCE_POOL_ADDRESS}&page=1&offset=15&sort=desc&apikey=${CELOSCAN_API_KEY}`);
         const cusdData = await cusdRes.json();
         
-        const nftRes = await fetch(`https://api-sepolia.celoscan.io/api?module=account&action=tokennfttx&address=${POLICY_NFT_ADDRESS}&page=1&offset=15&sort=desc&apikey=${CELOSCAN_API_KEY}`);
+        const nftRes = await fetch(`https://celo-alfajores.blockscout.com/api?module=account&action=tokennfttx&address=${POLICY_NFT_ADDRESS}&page=1&offset=15&sort=desc&apikey=${CELOSCAN_API_KEY}`);
         const nftData = await nftRes.json();
 
         let combined: any[] = [];

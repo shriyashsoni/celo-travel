@@ -96,6 +96,14 @@ function updateFrontendFiles(cusdAddress, policyNFTAddress, agentRegistryAddress
     fs.writeFileSync(pagePath, pageData);
     console.log("app/buy-policy/page.tsx updated with new cUSD address!");
   }
+
+  const adminPath = path.join(__dirname, "../app/admin/page.tsx");
+  if (fs.existsSync(adminPath)) {
+    let adminData = fs.readFileSync(adminPath, "utf8");
+    adminData = adminData.replace(/const CUSD_SEPOLIA_ADDRESS = "0x[a-fA-F0-9]{40}";/, `const CUSD_SEPOLIA_ADDRESS = "${cusdAddress}";`);
+    fs.writeFileSync(adminPath, adminData);
+    console.log("app/admin/page.tsx updated with new cUSD address!");
+  }
 }
 
 main().catch(console.error);
