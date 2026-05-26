@@ -8,7 +8,7 @@
   --primary: 0 0% 100%;
   --primary-foreground: 213 45% 67%;
   --border: 0 0% 100% / 0.2;
-  --radius: 9999px;
+  --radius: 16px;
   --font-heading: 'Instrument Serif', serif;
   --font-body: 'Barlow', sans-serif;
 }
