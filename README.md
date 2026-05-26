@@ -22,13 +22,20 @@ By combining **Celo’s mobile-first stablecoin infrastructure (cUSD)** with **a
 
 ## 🌟 Overview: The DeFAI Super App
 
-TravelShield has evolved into a comprehensive autonomous financial suite utilizing a network of AI Agents to protect and grow your travel capital:
+TravelShield has evolved into a comprehensive autonomous financial suite utilizing a network of AI Agents to protect and grow your travel capital. **All features are 100% connected to live Celo Mainnet smart contracts and real-world APIs with zero hardcoded mock data:**
 
 1. ⚡ **Autonomous Claim Oracle**: Monitors real-time flight statuses (via AviationStack) and autonomously triggers smart contract payouts directly to your wallet upon detecting a delay or cancellation. No manual paperwork.
-2. 💬 **Conversational DeFi Agent**: A natural-language interface enabling users to easily mint policies, manage their stablecoin portfolio, and interact with DeFi via simple chat commands.
-3. 🌱 **AI Savings Coach**: Helps users set travel goals, automates cUSD deposits, and optimizes yield strategies. Features ReFi mechanics like "Round-Up to Cause" (e.g., donating spare change to the Glo Dollar Climate Fund).
-4. 🌍 **FX Hedging Agent**: Designed for emerging market users (e.g., Nigeria, Kenya, Argentina). The agent monitors local currency volatility and automatically converts incoming fiat into cUSD to protect against devaluation.
-5. 📅 **Autopay Manager**: Tracks recurring stablecoin transactions for seamless premium renewals and subscription management.
+2. 💬 **Conversational DeFi Agent**: A natural-language interface enabling users to easily mint policies, swap assets, and interact with DeFi via simple chat commands.
+3. 🌱 **AI Savings Coach (100% On-Chain Deposits & localStorage Persistence)**: 
+   * Users can create travel goals that persist in the browser via `localStorage`.
+   * Features **live cUSD balance tracking** directly from the Celo blockchain.
+   * Savings deposits execute **real ERC-20 `transfer` contract calls** directly to the deployed `InsurancePool` vault contract (`0xc753f9F1f41643eC934E74AA3197E64274088Ec0`) on Celo Mainnet!
+   * Integrated ReFi mechanics like "Round-Up to Cause" (e.g., donating spare change to the Glo Dollar Climate Fund).
+4. 🌍 **FX Hedging Agent (Real-Time Exchange Rates API)**: 
+   * Pulls **live real-world USD exchange rates** in real-time from an open market FX API (`open.er-api.com`).
+   * Designed for emerging market users (e.g., Nigeria, Kenya, Argentina, Turkey). The agent monitors real currency drops and dynamically generates "Hedge Now" alerts to protect local capital against devaluation.
+5. 📅 **Autopay Manager (Live Blockchain Transaction History Scanner)**: 
+   * Instead of mock placeholders, this agent **dynamically scans the user's Celo Mainnet transaction history** (via Celoscan API) for recurring cUSD ERC-20 transfers to identify active on-chain subscriptions and automatically list, fund, or cancel them.
 
 ---
 
