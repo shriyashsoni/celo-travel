@@ -87,6 +87,15 @@ Our smart contracts are verified and deployed across both **Celo Mainnet** and *
 | **Agent Registry** | [`0x9Cc1E244B67377ECA8A443B076D887f73550c43C`](https://celoscan.io/address/0x9Cc1E244B67377ECA8A443B076D887f73550c43C) |
 | **Insurance Pool** | [`0xc753f9F1f41643eC934E74AA3197E64274088Ec0`](https://celoscan.io/address/0xc753f9F1f41643eC934E74AA3197E64274088Ec0) |
 
+### 🤖 ERC-8004 On-Chain Agent ID Registration
+To satisfy the Proof of Ship AI Track criteria, our autonomous payout agent has been officially registered and verified on the global **ERC-8004 Celo Mainnet Identity Registry**:
+
+* **ERC-8004 Identity Registry Address:** `0x8004A169FB4a3325136EB29fA0ceB6D2e539a432`
+* **Agent Signer Wallet Address:** `0x31541C01Bb04A76647fc40B8288E6FD7Df919aAE`
+* **Minted Agent ID (NFT):** `9179`
+* **On-Chain Registry Transaction:** [`0x78a26ca5cce3fa40433ae32f4e4bbffcbe4ec32838f9514426b51cbf226a86c3`](https://celoscan.io/tx/0x78a26ca5cce3fa40433ae32f4e4bbffcbe4ec32838f9514426b51cbf226a86c3)
+* **ERC-8004 Live Explorer Link:** [`https://8004scan.io/agent/9179`](https://8004scan.io/agent/9179)
+
 ### 🟨 Celo Sepolia (Testnet)
 | Contract | Address / Link |
 | :--- | :--- |
