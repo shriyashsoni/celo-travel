@@ -76,7 +76,7 @@ export default function CertificatePage() {
           </div>
           <div className="flex gap-4">
             <a 
-              href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`Just secured my flight ${flightNumber} on-chain with TravelShield! 🛡️✈️\n\n🔗 Transaction: https://celo-alfajores.blockscout.com/tx/${txHash}\n\nGet your own autonomous flight insurance at: https://celo-travel.vercel.app\n\n#TravelShield #Celo #Web3 #BuildOnCelo`)}`}
+              href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`Just secured my flight ${flightNumber} on-chain with TravelShield! 🛡️✈️\n\n🔗 Transaction: https://celoscan.io/tx/${txHash}\n\nGet your own autonomous flight insurance at: https://celo-travel.vercel.app\n\n#TravelShield #Celo #Web3 #BuildOnCelo`)}`}
               target="_blank" 
               rel="noopener noreferrer"
               className="px-6 py-3 rounded-full bg-[#1DA1F2]/10 hover:bg-[#1DA1F2]/20 border border-[#1DA1F2]/50 text-[#1DA1F2] font-medium text-sm flex items-center gap-2 transition-all"
@@ -117,9 +117,9 @@ export default function CertificatePage() {
               </div>
               <div className="text-right">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/10 text-green-400 border border-green-500/20 text-xs font-semibold uppercase mb-2">
-                  <CheckCircle2 size={14} /> Confirmed On-Chain
+                   <CheckCircle2 size={14} /> Confirmed On-Chain
                 </div>
-                <p className="font-mono text-xs text-white/40">Network: Celo Sepolia Testnet</p>
+                <p className="font-mono text-xs text-white/40">Network: Celo Mainnet</p>
               </div>
             </div>
 
@@ -167,13 +167,13 @@ export default function CertificatePage() {
                   <p className="text-xs text-white/50 mb-1">Transaction Hash:</p>
                   <p className="font-mono text-xs text-blue-400 mb-3">{txHash}</p>
                   <a 
-                    href={`https://celo-alfajores.blockscout.com/tx/${txHash}`}
+                    href={`https://celoscan.io/tx/${txHash}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-xs font-medium text-white/80 hover:text-white underline underline-offset-4 flex items-center gap-1"
                   >
                     <FileText size={12} />
-                    View on Celo Blockscout
+                    View on Celoscan
                   </a>
                 </div>
               </div>

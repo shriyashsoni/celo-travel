@@ -8,9 +8,9 @@ import { parseAbi, formatUnits } from "viem";
 import { PolicyOverview } from "@/components/policy-overview";
 import { LiveTVLChart } from "@/components/live-tvl-chart";
 
-const POLICY_NFT_ADDRESS = ("0xb37d83B8f7260b83aAc7013c2c09b329eE37986C" as string).trim() as `0x${string}`;
-const INSURANCE_POOL_ADDRESS = ("0x89FDD0Ad4bd2B2c48ECB39A6f636Af000F56Abe6" as string).trim() as `0x${string}`;
-const CUSD_SEPOLIA_ADDRESS = ("0x666a2c9a052203F53B2576a984bCC0BFa539417F" as string).trim() as `0x${string}`;
+const POLICY_NFT_ADDRESS = (process.env.NEXT_PUBLIC_POLICY_NFT_ADDRESS || "0xeBa31f2f2BcEe6089adDE62dd69c1B05f5092e3A").trim() as `0x${string}`;
+const INSURANCE_POOL_ADDRESS = (process.env.NEXT_PUBLIC_INSURANCE_POOL_ADDRESS || "0xc753f9F1f41643eC934E74AA3197E64274088Ec0").trim() as `0x${string}`;
+const CUSD_SEPOLIA_ADDRESS = "0x765DE816845861e75A25fCA122bb6898B8B1282a" as `0x${string}`; // Native cUSD Mainnet
 const CELOSCAN_API_KEY = process.env.NEXT_PUBLIC_CELOSCAN_API_KEY || "A7PZRDK4NTCBJP99CI5KUVVG84UQVCMT2Z";
 
 const abi = parseAbi([
@@ -99,10 +99,10 @@ export default function AgentDashboardPage() {
     const fetchHistory = async () => {
       try {
         setLoadingHistory(true);
-        const cusdRes = await fetch(`https://celo-alfajores.blockscout.com/api?module=account&action=tokentx&address=${INSURANCE_POOL_ADDRESS}&page=1&offset=15&sort=desc&apikey=${CELOSCAN_API_KEY}`);
+        const cusdRes = await fetch(`https://api.celoscan.io/api?module=account&action=tokentx&address=${INSURANCE_POOL_ADDRESS}&page=1&offset=15&sort=desc&apikey=${CELOSCAN_API_KEY}`);
         const cusdData = await cusdRes.json();
         
-        const nftRes = await fetch(`https://celo-alfajores.blockscout.com/api?module=account&action=tokennfttx&address=${POLICY_NFT_ADDRESS}&page=1&offset=15&sort=desc&apikey=${CELOSCAN_API_KEY}`);
+        const nftRes = await fetch(`https://api.celoscan.io/api?module=account&action=tokennfttx&address=${POLICY_NFT_ADDRESS}&page=1&offset=15&sort=desc&apikey=${CELOSCAN_API_KEY}`);
         const nftData = await nftRes.json();
 
         let combined: any[] = [];
