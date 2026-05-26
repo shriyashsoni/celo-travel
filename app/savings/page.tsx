@@ -21,10 +21,14 @@ export default function SavingsCoachPage() {
   const [goalAmount, setGoalAmount] = useState("");
   
   // Savings goals
-  const [goals, setGoals] = useState([
-    { id: 1, name: "Tokyo Trip 2026", target: 2500, current: 850, active: true },
-    { id: 2, name: "Premium Insurance Fund", target: 100, current: 45, active: true }
-  ]);
+  const [goals, setGoals] = useState<any[]>([]);
+
+  React.useEffect(() => {
+    const saved = localStorage.getItem("travelshield_savings_goals");
+    if (saved) {
+      setGoals(JSON.parse(saved));
+    }
+  }, []);
 
   const { data: balance, refetch: refetchBalance } = useReadContract({
     address: CUSD_MAINNET_ADDRESS,
@@ -41,13 +45,16 @@ export default function SavingsCoachPage() {
     e.preventDefault();
     if (!goalName || !goalAmount) return;
     
-    setGoals([...goals, {
+    const newGoals = [...goals, {
       id: Date.now(),
       name: goalName,
       target: parseFloat(goalAmount),
       current: 0,
       active: true
-    }]);
+    }];
+    
+    setGoals(newGoals);
+    localStorage.setItem("travelshield_savings_goals", JSON.stringify(newGoals));
     
     setGoalName("");
     setGoalAmount("");
@@ -73,12 +80,14 @@ export default function SavingsCoachPage() {
         toast.success(`Transaction Sent! Hash: ${txHash.substring(0, 10)}...`);
         
         // Update local state dynamically to match on-chain success
-        setGoals(prevGoals => prevGoals.map(g => {
+        const updatedGoals = goals.map(g => {
           if (g.id === goalId) {
             return { ...g, current: Math.min(g.current + amount, g.target) };
           }
           return g;
-        }));
+        });
+        setGoals(updatedGoals);
+        localStorage.setItem("travelshield_savings_goals", JSON.stringify(updatedGoals));
 
         setTimeout(() => refetchBalance(), 4000);
       },
@@ -169,65 +178,77 @@ export default function SavingsCoachPage() {
           <div className="lg:col-span-2 space-y-6">
             <h2 className="text-2xl font-heading italic mb-2">Your On-Chain Vaults</h2>
             
-            {goals.map(goal => {
-              const progress = Math.min((goal.current / goal.target) * 100, 100);
-              
-              return (
-                <motion.div 
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  key={goal.id} 
-                  className="liquid-glass rounded-3xl p-6 border border-white/5 relative overflow-hidden group"
-                >
-                  <div className="flex justify-between items-start mb-6">
-                    <div>
-                      <h3 className="text-xl font-heading italic mb-1">{goal.name}</h3>
-                      <p className="text-sm text-white/50">{goal.current.toLocaleString()} / {goal.target.toLocaleString()} cUSD</p>
+            {goals.length === 0 ? (
+              <div className="liquid-glass rounded-3xl p-12 border border-white/5 text-center flex flex-col items-center justify-center min-h-[300px]">
+                <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-6">
+                  <Target className="text-white/40 animate-pulse" size={28} />
+                </div>
+                <h3 className="text-xl font-heading italic mb-2">No Active Vaults</h3>
+                <p className="text-sm text-white/50 max-w-sm">
+                  Create a custom travel goal on the left to activate your secure on-chain cUSD yield vault!
+                </p>
+              </div>
+            ) : (
+              goals.map(goal => {
+                const progress = Math.min((goal.current / goal.target) * 100, 100);
+                
+                return (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    key={goal.id} 
+                    className="liquid-glass rounded-3xl p-6 border border-white/5 relative overflow-hidden group"
+                  >
+                    <div className="flex justify-between items-start mb-6">
+                      <div>
+                        <h3 className="text-xl font-heading italic mb-1">{goal.name}</h3>
+                        <p className="text-sm text-white/50">{goal.current.toLocaleString()} / {goal.target.toLocaleString()} cUSD</p>
+                      </div>
+                      {progress === 100 ? (
+                        <div className="flex items-center gap-1.5 px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-xs font-medium">
+                          <CheckCircle2 size={14} /> Goal Reached
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-1.5 px-3 py-1 bg-white/10 text-white/70 rounded-full text-xs font-medium">
+                          <TrendingUp size={14} /> Earning Yield
+                        </div>
+                      )}
                     </div>
-                    {progress === 100 ? (
-                      <div className="flex items-center gap-1.5 px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-xs font-medium">
-                        <CheckCircle2 size={14} /> Goal Reached
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-1.5 px-3 py-1 bg-white/10 text-white/70 rounded-full text-xs font-medium">
-                        <TrendingUp size={14} /> Earning Yield
-                      </div>
-                    )}
-                  </div>
 
-                  <div className="h-3 w-full bg-black/50 rounded-full overflow-hidden mb-6 border border-white/10">
-                    <div 
-                      className="h-full bg-gradient-to-r from-green-500 to-emerald-400 transition-all duration-1000 ease-out"
-                      style={{ width: `${progress}%` }}
-                    />
-                  </div>
+                    <div className="h-3 w-full bg-black/50 rounded-full overflow-hidden mb-6 border border-white/10">
+                      <div 
+                        className="h-full bg-gradient-to-r from-green-500 to-emerald-400 transition-all duration-1000 ease-out"
+                        style={{ width: `${progress}%` }}
+                      />
+                    </div>
 
-                  <div className="flex flex-wrap gap-3">
-                    <button 
-                      onClick={() => handleQuickSaveOnChain(goal.id, 10)}
-                      disabled={progress === 100 || isPending}
-                      className="px-4 py-2 liquid-glass hover:bg-white/10 rounded-full text-sm font-medium transition-colors disabled:opacity-50 flex items-center gap-1"
-                    >
-                      {isPending ? <Activity size={14} className="animate-spin" /> : "+ 10 cUSD"}
-                    </button>
-                    <button 
-                      onClick={() => handleQuickSaveOnChain(goal.id, 50)}
-                      disabled={progress === 100 || isPending}
-                      className="px-4 py-2 liquid-glass hover:bg-white/10 rounded-full text-sm font-medium transition-colors disabled:opacity-50 flex items-center gap-1"
-                    >
-                      {isPending ? <Activity size={14} className="animate-spin" /> : "+ 50 cUSD"}
-                    </button>
-                    <button 
-                      onClick={() => handleQuickSaveOnChain(goal.id, 100)}
-                      disabled={progress === 100 || isPending}
-                      className="px-4 py-2 bg-white text-black hover:bg-green-400 rounded-full text-sm font-medium transition-colors ml-auto flex items-center gap-2 disabled:opacity-50"
-                    >
-                      Deposit 100 cUSD <ArrowRight size={16} />
-                    </button>
-                  </div>
-                </motion.div>
-              )
-            })}
+                    <div className="flex flex-wrap gap-3">
+                      <button 
+                        onClick={() => handleQuickSaveOnChain(goal.id, 10)}
+                        disabled={progress === 100 || isPending}
+                        className="px-4 py-2 liquid-glass hover:bg-white/10 rounded-full text-sm font-medium transition-colors disabled:opacity-50 flex items-center gap-1"
+                      >
+                        {isPending ? <Activity size={14} className="animate-spin" /> : "+ 10 cUSD"}
+                      </button>
+                      <button 
+                        onClick={() => handleQuickSaveOnChain(goal.id, 50)}
+                        disabled={progress === 100 || isPending}
+                        className="px-4 py-2 liquid-glass hover:bg-white/10 rounded-full text-sm font-medium transition-colors disabled:opacity-50 flex items-center gap-1"
+                      >
+                        {isPending ? <Activity size={14} className="animate-spin" /> : "+ 50 cUSD"}
+                      </button>
+                      <button 
+                        onClick={() => handleQuickSaveOnChain(goal.id, 100)}
+                        disabled={progress === 100 || isPending}
+                        className="px-4 py-2 bg-white text-black hover:bg-green-400 rounded-full text-sm font-medium transition-colors ml-auto flex items-center gap-2 disabled:opacity-50"
+                      >
+                        Deposit 100 cUSD <ArrowRight size={16} />
+                      </button>
+                    </div>
+                  </motion.div>
+                )
+              })
+            )}
           </div>
 
         </div>
