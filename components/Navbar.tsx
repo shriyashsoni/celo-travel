@@ -33,6 +33,10 @@ export default function Navbar() {
     { name: "Home", href: "/" },
     { name: "Buy Policy", href: "/buy-policy" },
     { name: "My Policies", href: "/policies" },
+    { name: "AI Agent", href: "/agent" },
+    { name: "Savings", href: "/savings" },
+    { name: "Autopay", href: "/autopay" },
+    { name: "FX Shield", href: "/fx-shield" },
   ];
 
   return (

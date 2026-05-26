@@ -15,7 +15,7 @@ export interface MockERC20$Type {
   readonly deployedLinkReferences: {};
   readonly immutableReferences: {};
   readonly inputSourceName: "project/contracts/MockERC20.sol";
-  readonly buildInfoId: "solc-0_8_24-8659f76da35fee110b4195f48c4d1c3fde0f151f";
+  readonly buildInfoId: "solc-0_8_24-403687140a3897bea83a793fb19dfa76e3e50536";
 };
 
 import "hardhat/types/artifacts";

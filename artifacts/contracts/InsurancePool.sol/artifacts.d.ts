@@ -15,7 +15,7 @@ export interface InsurancePool$Type {
   readonly deployedLinkReferences: {};
   readonly immutableReferences: {};
   readonly inputSourceName: "project/contracts/InsurancePool.sol";
-  readonly buildInfoId: "solc-0_8_24-0ebbee58dca3fe4cf3f7dc60a997558b75fe0418";
+  readonly buildInfoId: "solc-0_8_24-403687140a3897bea83a793fb19dfa76e3e50536";
 };
 
 import "hardhat/types/artifacts";

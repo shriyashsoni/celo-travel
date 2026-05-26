@@ -1,7 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { ArrowUpRight, ShieldCheck, Zap, Coins, Globe, Lock } from "lucide-react"
+import { ArrowUpRight, ShieldCheck, Zap, Coins, Globe, Lock, Bot, Target, Globe2, Calendar } from "lucide-react"
 import { BlurText } from "@/components/BlurText"
 import { HLSVideo } from "@/components/HLSVideo"
 import Link from "next/link"
@@ -227,6 +227,59 @@ export default function Home() {
             <h3 className="text-lg font-heading italic text-white">Guaranteed by Code</h3>
             <p className="text-white/60 font-body font-light text-sm">Smart contracts hold the funds. Trust math, not middlemen.</p>
           </div>
+        </div>
+      </section>
+
+      {/* SECTION 6.5 — AGENTS & DEFAI */}
+      <section className="py-24 px-6 md:px-16 lg:px-24 max-w-7xl mx-auto" id="agents">
+        <div className="flex flex-col items-center text-center mb-16">
+          <div className="liquid-glass rounded-full px-3.5 py-1 text-xs font-medium text-purple-400 border border-purple-500/30 inline-flex items-center gap-2 mb-4">
+            <Bot size={14} /> DeFAI Super App
+          </div>
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-heading italic text-white tracking-tight leading-[0.9]">
+            More than just insurance.
+          </h2>
+          <p className="font-body font-light text-white/60 text-lg mt-6 max-w-2xl">
+            TravelShield now includes autonomous agents to manage your entire travel finance lifecycle on Celo.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Link href="/agent" className="liquid-glass rounded-3xl p-8 group hover:bg-white/5 transition-all border border-white/5 hover:border-purple-500/30 flex flex-col items-start text-left">
+            <div className="w-12 h-12 rounded-full liquid-glass-strong flex items-center justify-center text-purple-400 mb-6 group-hover:scale-110 transition-transform">
+              <Bot size={24} />
+            </div>
+            <h3 className="text-2xl font-heading italic text-white mb-2">Conversational DeFi Agent</h3>
+            <p className="text-white/60 font-light text-sm mb-6 flex-1">Chat naturally to buy policies, swap cUSD, or check yields. Powered by Groq LLM.</p>
+            <span className="text-purple-400 text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all">Try Agent <ArrowUpRight size={16} /></span>
+          </Link>
+
+          <Link href="/savings" className="liquid-glass rounded-3xl p-8 group hover:bg-white/5 transition-all border border-white/5 hover:border-green-500/30 flex flex-col items-start text-left">
+            <div className="w-12 h-12 rounded-full liquid-glass-strong flex items-center justify-center text-green-400 mb-6 group-hover:scale-110 transition-transform">
+              <Target size={24} />
+            </div>
+            <h3 className="text-2xl font-heading italic text-white mb-2">AI Savings Coach</h3>
+            <p className="text-white/60 font-light text-sm mb-6 flex-1">Set travel goals, auto-deposit cUSD, and earn yield. The agent nudges you to stay on track.</p>
+            <span className="text-green-400 text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all">Start Saving <ArrowUpRight size={16} /></span>
+          </Link>
+
+          <Link href="/fx-shield" className="liquid-glass rounded-3xl p-8 group hover:bg-white/5 transition-all border border-white/5 hover:border-blue-500/30 flex flex-col items-start text-left">
+            <div className="w-12 h-12 rounded-full liquid-glass-strong flex items-center justify-center text-blue-400 mb-6 group-hover:scale-110 transition-transform">
+              <Globe2 size={24} />
+            </div>
+            <h3 className="text-2xl font-heading italic text-white mb-2">FX Hedging Agent</h3>
+            <p className="text-white/60 font-light text-sm mb-6 flex-1">Protect your local currency from devaluation. Auto-convert to cUSD when volatility spikes.</p>
+            <span className="text-blue-400 text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all">View Dashboard <ArrowUpRight size={16} /></span>
+          </Link>
+
+          <Link href="/autopay" className="liquid-glass rounded-3xl p-8 group hover:bg-white/5 transition-all border border-white/5 hover:border-orange-500/30 flex flex-col items-start text-left">
+            <div className="w-12 h-12 rounded-full liquid-glass-strong flex items-center justify-center text-orange-400 mb-6 group-hover:scale-110 transition-transform">
+              <Calendar size={24} />
+            </div>
+            <h3 className="text-2xl font-heading italic text-white mb-2">Bill Pay & Autopay Agent</h3>
+            <p className="text-white/60 font-light text-sm mb-6 flex-1">Never miss a premium. The agent auto-pays your recurring stablecoin bills and subscriptions.</p>
+            <span className="text-orange-400 text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all">Manage Bills <ArrowUpRight size={16} /></span>
+          </Link>
         </div>
       </section>
 

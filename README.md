@@ -1,87 +1,114 @@
 <div align="center">
-  <h1>🛡️ TravelShield | Celo Autonomous Insurance</h1>
-  <p><em>The Next-Generation Parametric Travel Insurance Protocol powered by AI, deployed on the Celo Network.</em></p>
+  <h1>🛡️ TravelShield | Celo DeFAI Super App</h1>
+  <p><em>The Next-Generation Parametric Insurance & Travel Finance Protocol powered by AI, deployed on the Celo Network.</em></p>
   
   [![Celo](https://img.shields.io/badge/Deployed_on-Celo-35D07F?style=for-the-badge&logo=celo&logoColor=white)](https://celo.org/)
   [![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)](https://nextjs.org/)
   [![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
   [![Solidity](https://img.shields.io/badge/Solidity-%23363636.svg?style=for-the-badge&logo=solidity&logoColor=white)](https://soliditylang.org/)
+  [![AI](https://img.shields.io/badge/Powered_by-Groq_LLM-f55036?style=for-the-badge)](https://groq.com/)
 </div>
 
 <br />
 
-## 🌟 Overview
+## 📖 The Story Behind TravelShield
+The archaic, paper-heavy travel insurance industry is broken. Travelers spend hours filling out forms and waiting months for claim approvals—often for mere fractions of what they are owed. Especially for emerging markets, volatile local currencies and high fees make cross-border travel finances a nightmare.
 
-**TravelShield** transforms the archaic, paper-heavy travel insurance industry into a fully autonomous, transparent, and instant protocol. By leveraging the **Celo Blockchain**, **Groq LLM Intelligence**, and **AviationStack Oracles**, TravelShield completely eliminates the "claims process." If your flight is delayed, the AI Oracle verifies it, and the smart contract pays you out in **cUSD** automatically. No paperwork. No waiting. Just instant liquidity.
+**I built TravelShield for the Celo "Proof of Ship" AI Hackathon to fix this.**
+
+By combining **Celo’s mobile-first stablecoin infrastructure (cUSD)** with **autonomous AI agents (Groq LLM)**, I envisioned a world where money moves instantly when a flight delays. But during the hackathon, I realized insurance was just the beginning. The real vision was a **DeFAI (Decentralized Finance AI) Super App** that completely automates your travel finance lifecycle—from saving for a trip and hedging against currency devaluation, to autonomously paying premiums and executing instant on-chain payouts.
 
 ---
 
-## 🏗️ Architecture & Data Flow
+## 🌟 Overview: The DeFAI Super App
 
-Our protocol is entirely decentralized and autonomous. Here is the lifecycle of a Policy NFT from mint to automatic claim settlement:
+TravelShield has evolved into a comprehensive autonomous financial suite utilizing a network of AI Agents to protect and grow your travel capital:
+
+1. ⚡ **Autonomous Claim Oracle**: Monitors real-time flight statuses (via AviationStack) and autonomously triggers smart contract payouts directly to your wallet upon detecting a delay or cancellation. No manual paperwork.
+2. 💬 **Conversational DeFi Agent**: A natural-language interface enabling users to easily mint policies, manage their stablecoin portfolio, and interact with DeFi via simple chat commands.
+3. 🌱 **AI Savings Coach**: Helps users set travel goals, automates cUSD deposits, and optimizes yield strategies. Features ReFi mechanics like "Round-Up to Cause" (e.g., donating spare change to the Glo Dollar Climate Fund).
+4. 🌍 **FX Hedging Agent**: Designed for emerging market users (e.g., Nigeria, Kenya, Argentina). The agent monitors local currency volatility and automatically converts incoming fiat into cUSD to protect against devaluation.
+5. 📅 **Autopay Manager**: Tracks recurring stablecoin transactions for seamless premium renewals and subscription management.
+
+---
+
+## 🏗️ Workflow Architecture & Data Flow
+
+Our protocol is entirely decentralized and autonomous. Here is the lifecycle of how the AI agents and smart contracts interact:
 
 ```mermaid
 graph TD
-    A[User Connects Wallet] -->|Approves cUSD| B(Buys Policy via Smart Contract)
-    B -->|Mints| C{Policy NFT Issued}
-    C -->|Flight Status Monitored| D[AviationStack API]
-    D -->|Real-Time Flight Data| E[Groq AI Oracle Agent]
-    E -->|Analyzes Delay > 120 mins| F{Qualifies for Payout?}
-    F -->|Yes| G[Autonomous Signer Triggers Smart Contract]
-    F -->|No| H[Policy Remains Active / Expires]
-    G -->|Instant Settlement| I((cUSD Transferred to User Wallet))
+    %% User Interactions
+    User((User Wallet)) -->|1. Chat/Command| Agent[Conversational DeFi Agent]
+    User -->|2. Sets Goal| Savings[AI Savings Coach]
+    User -->|3. Funds Account| FX[FX Hedging Agent]
+    
+    %% Agent Logic
+    Agent -->|Helps Mint| Buy[Policy Checkout]
+    FX -->|Auto-Converts to cUSD| Wallet[(cUSD Balance)]
+    Savings -->|Rounds up change| ReFi[Donate to Glo Dollar]
+    
+    %% Core Insurance Lifecycle
+    Buy -->|Approves cUSD| Contract(InsurancePool Smart Contract)
+    Contract -->|Mints| NFT{Policy NFT}
+    NFT -.->|Flight Data Monitored| Oracle[AviationStack Oracle]
+    Oracle -->|Real-time feed| Groq[Groq AI Decision Engine]
+    
+    %% Settlement
+    Groq -->|If Delay > 120 mins| Signer[Autonomous Executer Signer]
+    Signer -->|Triggers Payout| Contract
+    Contract -->|Instant Settlement| Wallet
+    
+    classDef agent fill:#6b21a8,stroke:#d8b4fe,stroke-width:2px,color:#fff;
+    classDef smartcontract fill:#166534,stroke:#86efac,stroke-width:2px,color:#fff;
+    
+    class Agent,Savings,FX,Groq agent;
+    class Contract,NFT smartcontract;
 ```
 
 ---
 
-## ⚡ Core Technologies & APIs
+## 📜 Smart Contract Deployments
 
-TravelShield integrates state-of-the-art Web3 and Web2 infrastructure to guarantee 100% realism and production readiness.
+Our smart contracts are verified and deployed across both **Celo Mainnet** and **Celo Sepolia Testnet**.
+
+### 🟩 Celo Mainnet (Production)
+| Contract | Address / Link |
+| :--- | :--- |
+| **cUSD (Native)** | `0x765DE816845861e75A25fCA122bb6898B8B1282a` |
+| **Policy NFT (ERC-721)** | [`0xeBa31f2f2BcEe6089adDE62dd69c1B05f5092e3A`](https://celoscan.io/address/0xeBa31f2f2BcEe6089adDE62dd69c1B05f5092e3A) |
+| **Agent Registry** | [`0x9Cc1E244B67377ECA8A443B076D887f73550c43C`](https://celoscan.io/address/0x9Cc1E244B67377ECA8A443B076D887f73550c43C) |
+| **Insurance Pool** | [`0xc753f9F1f41643eC934E74AA3197E64274088Ec0`](https://celoscan.io/address/0xc753f9F1f41643eC934E74AA3197E64274088Ec0) |
+
+### 🟨 Celo Sepolia (Testnet)
+| Contract | Address / Link |
+| :--- | :--- |
+| **Mock cUSD** | `0xD5c7e7bEF4Fe77A8EE105fC70c1711C7FbF85873` |
+| **Policy NFT (ERC-721)** | [`0xe0D49E553C215f8EEa200b29ad2D5f4021502475`](https://alfajores.celoscan.io/address/0xe0D49E553C215f8EEa200b29ad2D5f4021502475) |
+| **Agent Registry** | [`0x84D3ff758f92d635c4b294603A86A289a81f4208`](https://alfajores.celoscan.io/address/0x84D3ff758f92d635c4b294603A86A289a81f4208) |
+| **Insurance Pool** | [`0xB34A869442fc27930e24dbB829Cb13dd77504Fa1`](https://alfajores.celoscan.io/address/0xB34A869442fc27930e24dbB829Cb13dd77504Fa1) |
+
+---
+
+## ⚡ Core Technologies
+
+TravelShield integrates state-of-the-art Web3 and AI infrastructure:
 
 | Technology | Purpose | Implementation Details |
 | :--- | :--- | :--- |
-| **Celo Network** | Settlement Layer | Ultra-low fee, mobile-first stablecoin (cUSD) transactions on Celo Sepolia. |
+| **Celo Network** | Settlement Layer | Ultra-low fee, mobile-first stablecoin (cUSD) transactions aligning with Celo's ReFi mission. |
 | **Wagmi & Viem** | Web3 Hooks | Manages direct interaction with the `InsurancePool` and `PolicyNFT` contracts. |
-| **AviationStack API** | Flight Data Oracle | Provides live, real-world flight status, departure delays, and cancellations. |
-| **Groq API** | AI Decision Engine | Powers the Autonomous Agent that parses flight data and triggers contract execution at lightning speeds. |
+| **Groq API** | AI Agent Brain | Powers the Conversational DeFAI agent and the autonomous oracle logic. |
+| **AviationStack API** | Flight Data Oracle | Provides live, real-world flight status for the claim settlement engine. |
 | **CeloScan API** | Real-Time Indexing | Dynamically indexes and feeds historical on-chain events straight to the Admin Dashboard. |
-| **WalletConnect** | Authentication | Secures the user connection with deep linking for mobile and desktop wallets. |
 
 ---
 
-## 📜 Smart Contract Deployments (Celo Sepolia Testnet)
-
-Our contracts are fully deployed and verified on the Celo network. 
-
-- **Policy NFT (ERC-721)**: [`0x4a2198F52f2E57047F21116Ed6Bb242600D8ce72`](https://celoscan.io/address/0x4a2198F52f2E57047F21116Ed6Bb242600D8ce72)
-- **Insurance Liquidity Pool**: [`0x59575D99d6691d109651C5bF357d78851dF90edB`](https://celoscan.io/address/0x59575D99d6691d109651C5bF357d78851dF90edB)
-- **Agent Registry**: [`0x508Da3a7a6d0FD9681BcCBC5C8b58fb3E0548B51`](https://celoscan.io/address/0x508Da3a7a6d0FD9681BcCBC5C8b58fb3E0548B51)
-- **Settlement Token**: `cUSD (Alfajores)`
-
----
-
-## 💻 Dashboard Features
-
-### 🔐 Admin Portal (`/admin`)
-- **Restricted Access**: Secured by an admin authentication layer.
-- **On-Chain Analytics**: Tracks Live TVL, Active Policyholders, and Total Premiums Collected natively from the Celo Blockchain.
-- **Policy Creator Tool**: Manually issue Custom Tier Policies (Delay vs. Cancellation) to any wallet address.
-- **Live CeloScan Feed**: A real-time terminal fetching network events directly from Celo blocks.
-- **Autonomous AI Oracle Demo**: An interactive module that queries real flights and showcases Groq LLM's exact reasoning process before simulating an on-chain signature.
-
-### 👤 User Dashboard (`/policies`)
-- **NFT Gallery**: View your minted TravelShield policies in a stunning Liquid Glass UI.
-- **Live Tracking**: See exactly when your policy expires and whether it is actively monitoring your flight or if a claim has been settled.
-- **1-Click Purchase**: Seamlessly approve cUSD and mint a new policy directly from the frontend.
-
----
-
-## 🚀 Getting Started
+## 🚀 Getting Started Locally
 
 ### Prerequisites
 - Node.js `v18+`
-- Celo Wallet or MetaMask (configured for Celo Alfajores Testnet)
-- Testnet cUSD (from Celo Faucet)
+- Celo Wallet or MetaMask (configured for Celo Mainnet or Alfajores)
 
 ### Installation
 
@@ -93,23 +120,11 @@ Our contracts are fully deployed and verified on the Celo network.
 
 2. **Install dependencies**
    ```bash
-   npm install
+   npm install --legacy-peer-deps
    ```
 
 3. **Configure Environment Variables**
-   Create a `.env` file in the root directory and add your API keys:
-   ```env
-   NEXT_PUBLIC_POLICY_NFT_ADDRESS=0x4a2198F52f2E57047F21116Ed6Bb242600D8ce72
-   NEXT_PUBLIC_INSURANCE_POOL_ADDRESS=0x59575D99d6691d109651C5bF357d78851dF90edB
-   
-   # APIs
-   CELOSCAN_API_KEY=your_celoscan_key
-   NEXT_PUBLIC_CELOSCAN_API_KEY=your_celoscan_key
-   AVIATIONSTACK_API_KEY=your_aviationstack_key
-   GROQ_API_KEY=your_groq_key
-   NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=your_walletconnect_id
-   PRIVATE_KEY=your_admin_wallet_private_key
-   ```
+   Copy `.env.example` to `.env` and fill in your API keys (AviationStack, Groq, Celoscan). Ensure you uncomment the specific network addresses (Mainnet vs Testnet) you wish to use.
 
 4. **Run the development server**
    ```bash
@@ -120,5 +135,5 @@ Our contracts are fully deployed and verified on the Celo network.
 ---
 
 <div align="center">
-  <i>Built for the Future of Decentralized Finance & Travel.</i>
+  <i>Built for the <b>Proof of Ship AI Track Hackathon</b>. Elevating the future of DeFAI on Celo.</i>
 </div>

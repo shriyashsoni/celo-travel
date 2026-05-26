@@ -1,41 +1,29 @@
 import { ethers } from "ethers";
 import * as dotenv from "dotenv";
-dotenv.config({ path: ".env.deploy" });
+dotenv.config({ path: ".env.mainnet" });
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
-dotenv.config();
-
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 async function main() {
-  const provider = new ethers.JsonRpcProvider(process.env.CELO_ALFAJORES_RPC); // 11142220 Celo Sepolia
+  const provider = new ethers.JsonRpcProvider(process.env.CELO_MAINNET_RPC || "https://forno.celo.org"); 
   const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
 
-  console.log("Starting full deployment to Celo Sepolia...");
+  console.log("Starting full deployment to Celo Mainnet...");
   console.log("Deploying contracts with the account:", wallet.address);
+
+  // Read actual cUSD Mainnet address
+  const cusdAddress = "0x765DE816845861e75A25fCA122bb6898B8B1282a";
+  console.log("Using Mainnet cUSD at:", cusdAddress);
 
   const readArtifact = (contractName) => {
     const p = path.join(__dirname, `../artifacts/contracts/${contractName}.sol/${contractName}.json`);
     return JSON.parse(fs.readFileSync(p, "utf8"));
   };
 
-  // 1. Deploy Mock cUSD
-  console.log("Deploying MockERC20 (Test cUSD)...");
-  const mockArtifact = readArtifact("MockERC20");
-  const MockFactory = new ethers.ContractFactory(mockArtifact.abi, mockArtifact.bytecode, wallet);
-  const cusd = await MockFactory.deploy("Test cUSD", "tcUSD");
-  await cusd.waitForDeployment();
-  const cusdAddress = await cusd.getAddress();
-  console.log("Mock cUSD deployed to:", cusdAddress);
-
-  console.log("Minting 10,000 tcUSD to deployer...");
-  const mintTx = await cusd.mint(wallet.address, ethers.parseUnits("10000", 18));
-  await mintTx.wait();
-  console.log("Minting complete!");
-
-  // 2. Deploy PolicyNFT
+  // 1. Deploy PolicyNFT
   console.log("Deploying PolicyNFT...");
   const policyArtifact = readArtifact("PolicyNFT");
   const PolicyNFTFactory = new ethers.ContractFactory(policyArtifact.abi, policyArtifact.bytecode, wallet);
@@ -44,7 +32,7 @@ async function main() {
   const policyNFTAddress = await policyNFT.getAddress();
   console.log("PolicyNFT deployed to:", policyNFTAddress);
 
-  // 3. Deploy AgentRegistry
+  // 2. Deploy AgentRegistry
   console.log("Deploying AgentRegistry...");
   const registryArtifact = readArtifact("AgentRegistry");
   const RegistryFactory = new ethers.ContractFactory(registryArtifact.abi, registryArtifact.bytecode, wallet);
@@ -53,7 +41,7 @@ async function main() {
   const agentRegistryAddress = await agentRegistry.getAddress();
   console.log("AgentRegistry deployed to:", agentRegistryAddress);
 
-  // 4. Deploy InsurancePool
+  // 3. Deploy InsurancePool
   console.log("Deploying InsurancePool...");
   const poolArtifact = readArtifact("InsurancePool");
   const PoolFactory = new ethers.ContractFactory(poolArtifact.abi, poolArtifact.bytecode, wallet);
@@ -62,15 +50,15 @@ async function main() {
   const insurancePoolAddress = await insurancePool.getAddress();
   console.log("InsurancePool deployed to:", insurancePoolAddress);
 
-  // 5. Set minter on PolicyNFT
+  // 4. Set minter on PolicyNFT
   console.log("Setting InsurancePool as the minter for PolicyNFT...");
   const setMinterTx = await policyNFT.setMinter(insurancePoolAddress);
   await setMinterTx.wait();
   console.log("Minter set successfully!");
 
   console.log("\n=================================");
-  console.log("Deployment Complete!");
-  console.log("Mock cUSD:", cusdAddress);
+  console.log("Mainnet Deployment Complete!");
+  console.log("cUSD (Mainnet):", cusdAddress);
   console.log("PolicyNFT:", policyNFTAddress);
   console.log("AgentRegistry:", agentRegistryAddress);
   console.log("InsurancePool:", insurancePoolAddress);
@@ -80,30 +68,32 @@ async function main() {
 }
 
 function updateFrontendFiles(cusdAddress, policyNFTAddress, agentRegistryAddress, insurancePoolAddress) {
-  const envPath = path.join(__dirname, "../.env.deploy");
+  const envPath = path.join(__dirname, "../.env.mainnet");
   if (fs.existsSync(envPath)) {
     let envData = fs.readFileSync(envPath, "utf8");
     envData = envData.replace(/NEXT_PUBLIC_POLICY_NFT_ADDRESS=.*/, `NEXT_PUBLIC_POLICY_NFT_ADDRESS=${policyNFTAddress}`);
     envData = envData.replace(/NEXT_PUBLIC_AGENT_REGISTRY_ADDRESS=.*/, `NEXT_PUBLIC_AGENT_REGISTRY_ADDRESS=${agentRegistryAddress}`);
     envData = envData.replace(/NEXT_PUBLIC_INSURANCE_POOL_ADDRESS=.*/, `NEXT_PUBLIC_INSURANCE_POOL_ADDRESS=${insurancePoolAddress}`);
     fs.writeFileSync(envPath, envData);
-    console.log(".env.deploy updated!");
+    console.log(".env.mainnet updated!");
   }
 
   const pagePath = path.join(__dirname, "../app/buy-policy/page.tsx");
   if (fs.existsSync(pagePath)) {
     let pageData = fs.readFileSync(pagePath, "utf8");
+    pageData = pageData.replace(/const isCorrectChain = chainId === 11142220;/, `const isCorrectChain = chainId === 42220;`);
     pageData = pageData.replace(/const CUSD_ADDRESS = "0x[a-fA-F0-9]{40}";/, `const CUSD_ADDRESS = "${cusdAddress}";`);
     fs.writeFileSync(pagePath, pageData);
-    console.log("app/buy-policy/page.tsx updated with new cUSD address!");
+    console.log("app/buy-policy/page.tsx updated with new cUSD address and chainId (42220)!");
   }
 
   const adminPath = path.join(__dirname, "../app/admin/page.tsx");
   if (fs.existsSync(adminPath)) {
     let adminData = fs.readFileSync(adminPath, "utf8");
+    adminData = adminData.replace(/const isCorrectChain = chainId === 11142220;/, `const isCorrectChain = chainId === 42220;`);
     adminData = adminData.replace(/const CUSD_SEPOLIA_ADDRESS = "0x[a-fA-F0-9]{40}";/, `const CUSD_SEPOLIA_ADDRESS = "${cusdAddress}";`);
     fs.writeFileSync(adminPath, adminData);
-    console.log("app/admin/page.tsx updated with new cUSD address!");
+    console.log("app/admin/page.tsx updated with new cUSD address and chainId (42220)!");
   }
 }
 

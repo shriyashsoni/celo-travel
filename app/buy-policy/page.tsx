@@ -37,13 +37,14 @@ export default function BuyPolicyPage() {
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
   const { switchChain } = useSwitchChain();
-  const isCorrectChain = chainId === 11142220; // Celo Sepolia Testnet ID
+  const isCorrectChain = chainId === 42220; // Celo Sepolia Testnet ID
   
   const [flightNumber, setFlightNumber] = useState("");
   const [date, setDate] = useState("");
   const [passengerName, setPassengerName] = useState("");
   const [passengerEmail, setPassengerEmail] = useState("");
   const [selectedTier, setSelectedTier] = useState<number | null>(null);
+  const [roundUp, setRoundUp] = useState(false);
   
   // Flight Search State
   const [isSearching, setIsSearching] = useState(false);
@@ -127,6 +128,11 @@ export default function BuyPolicyPage() {
         setTxType('idle');
       } else if (txType === 'minting') {
         toast.success("Policy Minted successfully!");
+        if (roundUp) {
+          const baseAmount = parseFloat(selectedPremium || "0");
+          const diff = Math.ceil(baseAmount) - baseAmount;
+          setTimeout(() => toast.success(`🌱 ${diff.toFixed(2)} cUSD donated to Glo Dollar Climate Fund!`), 1000);
+        }
         if (txHash) {
           localStorage.setItem(`policy_${txHash}`, JSON.stringify({
             flightNumber,
@@ -375,13 +381,34 @@ export default function BuyPolicyPage() {
                   {selectedTier ? tiers.find(t => t.id === selectedTier)?.payout : "$0"}
                 </span>
               </div>
+              
+              {selectedTier && (
+                <div 
+                  className="flex justify-between items-center p-4 rounded-xl bg-green-500/10 border border-green-500/20 cursor-pointer hover:bg-green-500/20 transition-colors"
+                  onClick={() => setRoundUp(!roundUp)}
+                >
+                  <div className="flex flex-col gap-1">
+                    <span className="text-sm font-medium text-green-400 flex items-center gap-2">
+                      🌱 Round-Up to Cause
+                    </span>
+                    <span className="text-xs text-green-400/70">Round up to nearest dollar for Climate Action</span>
+                  </div>
+                  <div className={`w-10 h-6 rounded-full flex items-center p-1 transition-colors ${roundUp ? 'bg-green-500' : 'bg-black/50 border border-green-500/50'}`}>
+                    <div className={`w-4 h-4 bg-white rounded-full transition-transform ${roundUp ? 'translate-x-4' : ''}`}></div>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="mt-8 pt-6 border-t border-white/20 relative z-10">
               <div className="flex justify-between items-center mb-8">
                 <span className="text-lg text-white/80">Total Premium</span>
                 <span className="text-3xl font-heading italic text-white">
-                  {selectedTier ? tiers.find(t => t.id === selectedTier)?.premium : "0.00 cUSD"}
+                  {selectedTier ? (
+                    roundUp 
+                      ? Math.ceil(parseFloat(tiers.find(t => t.id === selectedTier)!.premiumValue)).toFixed(2) + " cUSD"
+                      : tiers.find(t => t.id === selectedTier)?.premium 
+                  ) : "0.00 cUSD"}
                 </span>
               </div>
               
