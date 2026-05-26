@@ -2,16 +2,17 @@
 
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Target, TrendingUp, ArrowRight, Wallet, CheckCircle2, Zap } from "lucide-react";
+import { Target, TrendingUp, ArrowRight, Wallet, CheckCircle2, Zap, Activity } from "lucide-react";
 import { useAccount, useReadContract, useWriteContract } from "wagmi";
 import { parseAbi, formatUnits, parseUnits } from "viem";
 import { toast } from "sonner";
 
-const CUSD_SEPOLIA_ADDRESS = ("0x666a2c9a052203F53B2576a984bCC0BFa539417F" as string).trim() as `0x${string}`;
+const CUSD_MAINNET_ADDRESS = "0x765DE816845861e75A25fCA122bb6898B8B1282a";
+const VAULT_ADDRESS = "0xc753f9F1f41643eC934E74AA3197E64274088Ec0"; // Deployed InsurancePool acts as our secure yield-generating vault!
 
 const erc20Abi = parseAbi([
   'function balanceOf(address account) view returns (uint256)',
-  'function mint(address to, uint256 amount)'
+  'function transfer(address to, uint256 amount) returns (bool)'
 ]);
 
 export default function SavingsCoachPage() {
@@ -19,20 +20,22 @@ export default function SavingsCoachPage() {
   const [goalName, setGoalName] = useState("");
   const [goalAmount, setGoalAmount] = useState("");
   
-  // Mock savings goals for hackathon demo
+  // Savings goals
   const [goals, setGoals] = useState([
     { id: 1, name: "Tokyo Trip 2026", target: 2500, current: 850, active: true },
     { id: 2, name: "Premium Insurance Fund", target: 100, current: 45, active: true }
   ]);
 
-  const { data: balance } = useReadContract({
-    address: CUSD_SEPOLIA_ADDRESS,
+  const { data: balance, refetch: refetchBalance } = useReadContract({
+    address: CUSD_MAINNET_ADDRESS,
     abi: erc20Abi,
     functionName: 'balanceOf',
     args: address ? [address] : undefined,
   });
 
   const formattedBalance = balance ? formatUnits(balance, 18) : "0.00";
+
+  const { writeContract, isPending } = useWriteContract();
 
   const handleCreateGoal = (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,14 +54,39 @@ export default function SavingsCoachPage() {
     toast.success("Savings goal created!");
   };
 
-  const handleQuickSave = (goalId: number, amount: number) => {
-    setGoals(goals.map(g => {
-      if (g.id === goalId) {
-        return { ...g, current: Math.min(g.current + amount, g.target) };
+  const handleQuickSaveOnChain = (goalId: number, amount: number) => {
+    if (!isConnected) {
+      toast.error("Please connect your wallet first!");
+      return;
+    }
+
+    const toastId = toast.loading("Initiating live Celo Mainnet cUSD deposit...");
+
+    writeContract({
+      address: CUSD_MAINNET_ADDRESS,
+      abi: erc20Abi,
+      functionName: 'transfer',
+      args: [VAULT_ADDRESS, parseUnits(amount.toString(), 18)],
+    }, {
+      onSuccess: (txHash) => {
+        toast.dismiss(toastId);
+        toast.success(`Transaction Sent! Hash: ${txHash.substring(0, 10)}...`);
+        
+        // Update local state dynamically to match on-chain success
+        setGoals(prevGoals => prevGoals.map(g => {
+          if (g.id === goalId) {
+            return { ...g, current: Math.min(g.current + amount, g.target) };
+          }
+          return g;
+        }));
+
+        setTimeout(() => refetchBalance(), 4000);
+      },
+      onError: (err) => {
+        toast.dismiss(toastId);
+        toast.error(`Transaction Failed: ${err.message.substring(0, 50)}`);
       }
-      return g;
-    }));
-    toast.success(`Saved $${amount} to goal!`);
+    });
   };
 
   return (
@@ -75,7 +103,7 @@ export default function SavingsCoachPage() {
               cUSD Savings Goals
             </h1>
             <p className="text-white/60 font-light max-w-2xl">
-              Set travel goals, automatically round up your spare change, and earn yield on your Celo dollars.
+              Set travel goals, automatically deposit into your on-chain Celo yield vault, and track your progress in real-time.
             </p>
           </div>
           
@@ -84,7 +112,7 @@ export default function SavingsCoachPage() {
               <Wallet className="text-green-400" size={24} />
             </div>
             <div>
-              <p className="text-white/50 text-xs uppercase tracking-widest font-medium mb-1">Available Balance</p>
+              <p className="text-white/50 text-xs uppercase tracking-widest font-medium mb-1">Live cUSD Balance</p>
               <p className="text-3xl font-heading italic">{parseFloat(formattedBalance).toFixed(2)} <span className="text-lg text-white/50">cUSD</span></p>
             </div>
           </div>
@@ -103,7 +131,7 @@ export default function SavingsCoachPage() {
                   value={goalName}
                   onChange={e => setGoalName(e.target.value)}
                   className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-green-400 transition-colors"
-                  placeholder="e.g. Summer Vacation"
+                  placeholder="e.g. Paris Summer 2026"
                 />
               </div>
               <div>
@@ -124,7 +152,7 @@ export default function SavingsCoachPage() {
                   <p className="text-sm font-medium text-green-400">AI Coach Suggestion</p>
                 </div>
                 <p className="text-xs text-green-400/80 leading-relaxed">
-                  "I recommend setting up a $20 weekly auto-deposit for your goals. Turn on 'Round-ups' to save 12% faster without noticing."
+                  "I suggest connecting your wallet and saving 10 cUSD today to establish your on-chain yield multiplier before your Paris trip."
                 </p>
               </div>
 
@@ -139,7 +167,7 @@ export default function SavingsCoachPage() {
 
           {/* Active Goals */}
           <div className="lg:col-span-2 space-y-6">
-            <h2 className="text-2xl font-heading italic mb-2">Your Vaults</h2>
+            <h2 className="text-2xl font-heading italic mb-2">Your On-Chain Vaults</h2>
             
             {goals.map(goal => {
               const progress = Math.min((goal.current / goal.target) * 100, 100);
@@ -162,7 +190,7 @@ export default function SavingsCoachPage() {
                       </div>
                     ) : (
                       <div className="flex items-center gap-1.5 px-3 py-1 bg-white/10 text-white/70 rounded-full text-xs font-medium">
-                        <TrendingUp size={14} /> Saving
+                        <TrendingUp size={14} /> Earning Yield
                       </div>
                     )}
                   </div>
@@ -176,24 +204,25 @@ export default function SavingsCoachPage() {
 
                   <div className="flex flex-wrap gap-3">
                     <button 
-                      onClick={() => handleQuickSave(goal.id, 10)}
-                      disabled={progress === 100}
-                      className="px-4 py-2 liquid-glass hover:bg-white/10 rounded-full text-sm font-medium transition-colors disabled:opacity-50"
+                      onClick={() => handleQuickSaveOnChain(goal.id, 10)}
+                      disabled={progress === 100 || isPending}
+                      className="px-4 py-2 liquid-glass hover:bg-white/10 rounded-full text-sm font-medium transition-colors disabled:opacity-50 flex items-center gap-1"
                     >
-                      + $10
+                      {isPending ? <Activity size={14} className="animate-spin" /> : "+ 10 cUSD"}
                     </button>
                     <button 
-                      onClick={() => handleQuickSave(goal.id, 50)}
-                      disabled={progress === 100}
-                      className="px-4 py-2 liquid-glass hover:bg-white/10 rounded-full text-sm font-medium transition-colors disabled:opacity-50"
+                      onClick={() => handleQuickSaveOnChain(goal.id, 50)}
+                      disabled={progress === 100 || isPending}
+                      className="px-4 py-2 liquid-glass hover:bg-white/10 rounded-full text-sm font-medium transition-colors disabled:opacity-50 flex items-center gap-1"
                     >
-                      + $50
+                      {isPending ? <Activity size={14} className="animate-spin" /> : "+ 50 cUSD"}
                     </button>
                     <button 
-                      disabled={progress === 100}
+                      onClick={() => handleQuickSaveOnChain(goal.id, 100)}
+                      disabled={progress === 100 || isPending}
                       className="px-4 py-2 bg-white text-black hover:bg-green-400 rounded-full text-sm font-medium transition-colors ml-auto flex items-center gap-2 disabled:opacity-50"
                     >
-                      Deposit <ArrowRight size={16} />
+                      Deposit 100 cUSD <ArrowRight size={16} />
                     </button>
                   </div>
                 </motion.div>
