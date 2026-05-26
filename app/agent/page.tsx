@@ -72,9 +72,28 @@ export default function AgentPage() {
           <h1 className="text-4xl md:text-5xl font-heading italic mb-4">
             Conversational Agent
           </h1>
-          <p className="text-white/60 font-light">
+          <p className="text-white/60 font-light mb-6">
             Ask me to buy policies, swap cUSD, check yields, or hedge your local currency.
           </p>
+
+          <div className="flex justify-center gap-4 flex-wrap">
+            <a 
+              href="https://8004scan.io" 
+              target="_blank" 
+              rel="noreferrer"
+              className="liquid-glass px-4 py-2 rounded-full border border-purple-500/30 text-purple-400 hover:border-purple-500/60 hover:text-white transition-all text-xs font-semibold flex items-center gap-2 shadow-[0_0_15px_rgba(168,85,247,0.15)]"
+            >
+              <Sparkles size={14} className="text-purple-400 shrink-0" /> View Agent on 8004scan.io
+            </a>
+            <a 
+              href="https://docs.self.xyz/agent-id" 
+              target="_blank" 
+              rel="noreferrer"
+              className="liquid-glass px-4 py-2 rounded-full border border-emerald-500/30 text-emerald-400 hover:border-emerald-500/60 hover:text-white transition-all text-xs font-semibold flex items-center gap-2 shadow-[0_0_15px_rgba(16,185,129,0.15)]"
+            >
+              <Sparkles size={14} className="text-emerald-400 shrink-0" /> Register Self Agent ID (ERC-8004)
+            </a>
+          </div>
         </div>
 
         <div className="liquid-glass rounded-3xl flex-1 overflow-hidden flex flex-col border border-white/10 relative">
