@@ -31,7 +31,6 @@ export default function Navbar() {
 
   const navLinks = [
     { name: "Home", href: "/" },
-    ...(isConnected ? [{ name: "Dashboard", href: "/admin" }] : []),
     { name: "Docs", href: "/docs" },
     { name: "Whitepaper", href: "/whitepaper" },
   ];
