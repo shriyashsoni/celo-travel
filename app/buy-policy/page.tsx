@@ -6,6 +6,7 @@ import { Plane, Shield, ShieldCheck, Activity, CheckCircle, AlertCircle } from "
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt, useChainId, useSwitchChain } from "wagmi";
 import { parseAbi, parseUnits } from "viem";
 import { toast } from "sonner";
+import { DashboardShell } from "@/components/DashboardShell";
 
 const INSURANCE_POOL_ADDRESS = (process.env.NEXT_PUBLIC_INSURANCE_POOL_ADDRESS || "0xc753f9F1f41643eC934E74AA3197E64274088Ec0").trim() as `0x${string}`;
 const CUSD_ADDRESS = "0x765DE816845861e75A25fCA122bb6898B8B1282a" as `0x${string}`; // Native Celo Mainnet cUSD
@@ -199,315 +200,311 @@ export default function BuyPolicyPage() {
       functionName: 'buyPolicy',
       args: [flightNumber, selectedTier, BigInt(expiryTimestamp)],
     });
-  };
-
-  if (!mounted) return null;
+  }  if (!mounted) return null;
 
   return (
-    <div className="min-h-screen flex flex-col bg-black text-white font-body overflow-x-hidden">
-      <main className="flex-1 pt-32 pb-20 px-6 sm:px-8 max-w-7xl mx-auto w-full relative z-10">
-        <motion.div custom={0} initial="hidden" animate="visible" variants={fadeUp} className="text-center mb-16">
-          <h1 className="text-5xl md:text-6xl font-heading italic mb-6">
-            Secure Your Flight On-Chain
-          </h1>
-          <p className="text-lg font-light text-white/60 max-w-2xl mx-auto">
-            Select your coverage, approve cUSD directly from your wallet, and instantly mint your parametric insurance Policy NFT.
-          </p>
-        </motion.div>
+    <DashboardShell activeTab="buy">
+      <motion.div custom={0} initial="hidden" animate="visible" variants={fadeUp} className="text-center mb-16">
+        <h1 className="text-5xl md:text-6xl font-heading italic mb-6">
+          Secure Your Flight On-Chain
+        </h1>
+        <p className="text-lg font-light text-white/60 max-w-2xl mx-auto">
+          Select your coverage, approve cUSD directly from your wallet, and instantly mint your parametric insurance Policy NFT.
+        </p>
+      </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-          {/* Left Column: Form */}
-          <motion.div custom={1} initial="hidden" animate="visible" variants={fadeUp} className="liquid-glass rounded-3xl p-8">
-            <div className="flex items-center gap-3 mb-8 border-b border-white/10 pb-4">
-              <Plane className="text-white" size={24} />
-              <h2 className="text-2xl font-heading italic">Flight Details</h2>
-            </div>
-            
-            <div className="space-y-6">
-              <div className="flex gap-3 items-end">
-                <div className="flex-1">
-                  <label className="block text-sm font-medium text-white/70 mb-2">Flight Number</label>
-                  <input 
-                    type="text" 
-                    className="w-full liquid-glass bg-transparent border-none rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:ring-1 focus:ring-white/50 transition-all uppercase"
-                    placeholder="e.g. AA123"
-                    value={flightNumber}
-                    onChange={(e) => { setFlightNumber(e.target.value.toUpperCase()); setFlightData(null); }}
-                  />
-                </div>
-                <button 
-                  onClick={searchFlight}
-                  disabled={isSearching || !flightNumber}
-                  className="bg-white text-black px-6 py-3 rounded-xl font-medium hover:bg-white/90 transition-all disabled:opacity-50 h-[48px] flex items-center justify-center min-w-[100px]"
-                >
-                  {isSearching ? <Activity size={18} className="animate-spin" /> : "Search"}
-                </button>
-              </div>
-
-              {flightData && (
-                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="liquid-glass-strong border border-white/10 rounded-xl p-5 flex flex-col gap-4 relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl"></div>
-                  
-                  <div className="flex justify-between items-center border-b border-white/10 pb-3 relative z-10">
-                    <div>
-                      <span className="text-white/60 text-[10px] uppercase tracking-widest block mb-0.5">Airline</span>
-                      <span className="font-heading italic text-xl text-white">{flightData.airline}</span>
-                    </div>
-                    <div className="flex flex-col items-end">
-                      <span className="text-white/60 text-[10px] uppercase tracking-widest block mb-0.5">Status</span>
-                      <div className="flex items-center gap-1.5 px-2 py-1 bg-green-500/20 rounded-md text-green-400 text-xs font-semibold capitalize">
-                        <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></div>
-                        {flightData.status}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex justify-between items-center relative z-10">
-                    <div className="flex flex-col">
-                      <span className="text-2xl font-heading italic text-white">{flightData.departureIata}</span>
-                      <span className="text-xs text-white/50 uppercase tracking-widest mt-1">Departure</span>
-                    </div>
-                    <div className="flex-1 flex items-center justify-center px-4">
-                      <div className="w-full border-t border-dashed border-white/30 relative flex items-center justify-center">
-                        <Plane size={20} className="text-white/50 absolute" />
-                      </div>
-                    </div>
-                    <div className="flex flex-col text-right">
-                      <span className="text-2xl font-heading italic text-white">{flightData.arrivalIata}</span>
-                      <span className="text-xs text-white/50 uppercase tracking-widest mt-1">Arrival</span>
-                    </div>
-                  </div>
-
-                  <div className="flex justify-between items-center pt-3 border-t border-white/10 text-sm relative z-10">
-                    <span className="text-white/60">Scheduled Departure:</span>
-                    <span className="font-medium text-white">{flightData.scheduledTime ? new Date(flightData.scheduledTime).toLocaleString() : 'N/A'}</span>
-                  </div>
-                  
-                  <div className="pt-2 text-[10px] text-white/30 text-center font-mono flex items-center justify-center gap-1">
-                    <Activity size={10} /> Real data verified by AviationStack
-                  </div>
-                </motion.div>
-              )}
-
-              <div>
-                <label className="block text-sm font-medium text-white/70 mb-2">Departure Date</label>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+        {/* Left Column: Form */}
+        <motion.div custom={1} initial="hidden" animate="visible" variants={fadeUp} className="liquid-glass rounded-3xl p-8">
+          <div className="flex items-center gap-3 mb-8 border-b border-white/10 pb-4">
+            <Plane className="text-white" size={24} />
+            <h2 className="text-2xl font-heading italic">Flight Details</h2>
+          </div>
+          
+          <div className="space-y-6">
+            <div className="flex gap-3 items-end">
+              <div className="flex-1">
+                <label className="block text-sm font-medium text-white/70 mb-2">Flight Number</label>
                 <input 
-                  type="date" 
-                  className="w-full liquid-glass bg-transparent border-none rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-1 focus:ring-white/50 transition-all"
-                  value={date}
-                  style={{ colorScheme: "dark" }}
-                  onChange={(e) => setDate(e.target.value)}
+                  type="text" 
+                  className="w-full liquid-glass bg-transparent border-none rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:ring-1 focus:ring-white/50 transition-all uppercase"
+                  placeholder="e.g. AA123"
+                  value={flightNumber}
+                  onChange={(e) => { setFlightNumber(e.target.value.toUpperCase()); setFlightData(null); }}
                 />
               </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-white/70 mb-2">Passenger Name</label>
-                  <input 
-                    type="text" 
-                    className="w-full liquid-glass bg-transparent border-none rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:ring-1 focus:ring-white/50 transition-all"
-                    placeholder="John Doe"
-                    value={passengerName}
-                    onChange={(e) => setPassengerName(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-white/70 mb-2">Email Address</label>
-                  <input 
-                    type="email" 
-                    className="w-full liquid-glass bg-transparent border-none rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:ring-1 focus:ring-white/50 transition-all"
-                    placeholder="john@example.com"
-                    value={passengerEmail}
-                    onChange={(e) => setPassengerEmail(e.target.value)}
-                  />
-                </div>
-              </div>
+              <button 
+                onClick={searchFlight}
+                disabled={isSearching || !flightNumber}
+                className="bg-white text-black px-6 py-3 rounded-xl font-medium hover:bg-white/90 transition-all disabled:opacity-50 h-[48px] flex items-center justify-center min-w-[100px]"
+              >
+                {isSearching ? <Activity size={18} className="animate-spin" /> : "Search"}
+              </button>
             </div>
 
-            <div className="flex items-center gap-3 mb-6 mt-10 border-b border-white/10 pb-4">
-              <Shield className="text-white" size={24} />
-              <h2 className="text-2xl font-heading italic">Coverage Tiers</h2>
-            </div>
-
-            <div className="space-y-4">
-              {tiers.map((tier) => (
-                <div 
-                  key={tier.id}
-                  onClick={() => setSelectedTier(tier.id)}
-                  className={`relative p-5 rounded-2xl cursor-pointer transition-all ${
-                    selectedTier === tier.id 
-                      ? "liquid-glass-strong ring-1 ring-green-500/50" 
-                      : "liquid-glass hover:bg-white/5"
-                  }`}
-                >
-                  {selectedTier === tier.id && (
-                    <div className="absolute top-4 right-4 text-green-400">
-                      <ShieldCheck size={20} />
+            {flightData && (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="liquid-glass-strong border border-white/10 rounded-xl p-5 flex flex-col gap-4 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl"></div>
+                
+                <div className="flex justify-between items-center border-b border-white/10 pb-3 relative z-10">
+                  <div>
+                    <span className="text-white/60 text-[10px] uppercase tracking-widest block mb-0.5">Airline</span>
+                    <span className="font-heading italic text-xl text-white">{flightData.airline}</span>
+                  </div>
+                  <div className="flex flex-col items-end">
+                    <span className="text-white/60 text-[10px] uppercase tracking-widest block mb-0.5">Status</span>
+                    <div className="flex items-center gap-1.5 px-2 py-1 bg-green-500/20 rounded-md text-green-400 text-xs font-semibold capitalize">
+                      <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></div>
+                      {flightData.status}
                     </div>
-                  )}
-                  <div className="flex justify-between items-center mb-1">
-                    <h3 className="font-heading italic text-xl">{tier.delay}</h3>
-                    <span className="font-bold">{tier.premium}</span>
                   </div>
-                  <p className="text-sm text-white/60 font-light">Autonomous Payout: <span className="font-semibold text-white/90">{tier.payout}</span></p>
                 </div>
-              ))}
-            </div>
-          </motion.div>
 
-          {/* Right Column: Summary & Tx */}
-          <motion.div custom={2} initial="hidden" animate="visible" variants={fadeUp} className="liquid-glass rounded-3xl p-8 flex flex-col relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full blur-3xl"></div>
-            <h2 className="text-3xl font-heading italic mb-8 relative z-10">Checkout Summary</h2>
-            
-            <div className="flex-1 space-y-6 relative z-10">
-              <div className="flex justify-between items-center pb-4 border-b border-white/10">
-                <span className="text-white/60">Flight</span>
-                <span className="font-medium font-mono">{flightNumber || "---"}</span>
-              </div>
-              <div className="flex justify-between items-center pb-4 border-b border-white/10">
-                <span className="text-white/60">Date</span>
-                <span className="font-medium">{date || "---"}</span>
-              </div>
-              <div className="flex justify-between items-center pb-4 border-b border-white/10">
-                <span className="text-white/60">Selected Tier</span>
-                <span className="font-medium">
-                  {selectedTier ? tiers.find(t => t.id === selectedTier)?.delay : "None"}
-                </span>
-              </div>
-              <div className="flex justify-between items-center pb-4 border-b border-white/10">
-                <span className="text-white/60">Payout Amount</span>
-                <span className="font-medium text-green-400">
-                  {selectedTier ? tiers.find(t => t.id === selectedTier)?.payout : "$0"}
-                </span>
-              </div>
-              
-              {selectedTier && (
-                <div 
-                  className="flex justify-between items-center p-4 rounded-xl bg-green-500/10 border border-green-500/20 cursor-pointer hover:bg-green-500/20 transition-colors"
-                  onClick={() => setRoundUp(!roundUp)}
-                >
-                  <div className="flex flex-col gap-1">
-                    <span className="text-sm font-medium text-green-400 flex items-center gap-2">
-                      🌱 Round-Up to Cause
-                    </span>
-                    <span className="text-xs text-green-400/70">Round up to nearest dollar for Climate Action</span>
+                <div className="flex justify-between items-center relative z-10">
+                  <div className="flex flex-col">
+                    <span className="text-2xl font-heading italic text-white">{flightData.departureIata}</span>
+                    <span className="text-xs text-white/50 uppercase tracking-widest mt-1">Departure</span>
                   </div>
-                  <div className={`w-10 h-6 rounded-full flex items-center p-1 transition-colors ${roundUp ? 'bg-green-500' : 'bg-black/50 border border-green-500/50'}`}>
-                    <div className={`w-4 h-4 bg-white rounded-full transition-transform ${roundUp ? 'translate-x-4' : ''}`}></div>
+                  <div className="flex-1 flex items-center justify-center px-4">
+                    <div className="w-full border-t border-dashed border-white/30 relative flex items-center justify-center">
+                      <Plane size={20} className="text-white/50 absolute" />
+                    </div>
+                  </div>
+                  <div className="flex flex-col text-right">
+                    <span className="text-2xl font-heading italic text-white">{flightData.arrivalIata}</span>
+                    <span className="text-xs text-white/50 uppercase tracking-widest mt-1">Arrival</span>
                   </div>
                 </div>
+
+                <div className="flex justify-between items-center pt-3 border-t border-white/10 text-sm relative z-10">
+                  <span className="text-white/60">Scheduled Departure:</span>
+                  <span className="font-medium text-white">{flightData.scheduledTime ? new Date(flightData.scheduledTime).toLocaleString() : 'N/A'}</span>
+                </div>
+                
+                <div className="pt-2 text-[10px] text-white/30 text-center font-mono flex items-center justify-center gap-1">
+                  <Activity size={10} /> Real data verified by AviationStack
+                </div>
+              </motion.div>
+            )}
+
+            <div>
+              <label className="block text-sm font-medium text-white/70 mb-2">Departure Date</label>
+              <input 
+                type="date" 
+                className="w-full liquid-glass bg-transparent border-none rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-1 focus:ring-white/50 transition-all"
+                value={date}
+                style={{ colorScheme: "dark" }}
+                onChange={(e) => setDate(e.target.value)}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-white/70 mb-2">Passenger Name</label>
+                <input 
+                  type="text" 
+                  className="w-full liquid-glass bg-transparent border-none rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:ring-1 focus:ring-white/50 transition-all"
+                  placeholder="John Doe"
+                  value={passengerName}
+                  onChange={(e) => setPassengerName(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-white/70 mb-2">Email Address</label>
+                <input 
+                  type="email" 
+                  className="w-full liquid-glass bg-transparent border-none rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:ring-1 focus:ring-white/50 transition-all"
+                  placeholder="john@example.com"
+                  value={passengerEmail}
+                  onChange={(e) => setPassengerEmail(e.target.value)}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 mb-6 mt-10 border-b border-white/10 pb-4">
+            <Shield className="text-white" size={24} />
+            <h2 className="text-2xl font-heading italic">Coverage Tiers</h2>
+          </div>
+
+          <div className="space-y-4">
+            {tiers.map((tier) => (
+              <div 
+                key={tier.id}
+                onClick={() => setSelectedTier(tier.id)}
+                className={`relative p-5 rounded-2xl cursor-pointer transition-all ${
+                  selectedTier === tier.id 
+                    ? "liquid-glass-strong ring-1 ring-green-500/50" 
+                    : "liquid-glass hover:bg-white/5"
+                }`}
+              >
+                {selectedTier === tier.id && (
+                  <div className="absolute top-4 right-4 text-green-400">
+                    <ShieldCheck size={20} />
+                  </div>
+                )}
+                <div className="flex justify-between items-center mb-1">
+                  <h3 className="font-heading italic text-xl">{tier.delay}</h3>
+                  <span className="font-bold">{tier.premium}</span>
+                </div>
+                <p className="text-sm text-white/60 font-light">Autonomous Payout: <span className="font-semibold text-white/90">{tier.payout}</span></p>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Right Column: Summary & Tx */}
+        <motion.div custom={2} initial="hidden" animate="visible" variants={fadeUp} className="liquid-glass rounded-3xl p-8 flex flex-col relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full blur-3xl"></div>
+          <h2 className="text-3xl font-heading italic mb-8 relative z-10">Checkout Summary</h2>
+          
+          <div className="flex-1 space-y-6 relative z-10">
+            <div className="flex justify-between items-center pb-4 border-b border-white/10">
+              <span className="text-white/60">Flight</span>
+              <span className="font-medium font-mono">{flightNumber || "---"}</span>
+            </div>
+            <div className="flex justify-between items-center pb-4 border-b border-white/10">
+              <span className="text-white/60">Date</span>
+              <span className="font-medium">{date || "---"}</span>
+            </div>
+            <div className="flex justify-between items-center pb-4 border-b border-white/10">
+              <span className="text-white/60">Selected Tier</span>
+              <span className="font-medium">
+                {selectedTier ? tiers.find(t => t.id === selectedTier)?.delay : "None"}
+              </span>
+            </div>
+            <div className="flex justify-between items-center pb-4 border-b border-white/10">
+              <span className="text-white/60">Payout Amount</span>
+              <span className="font-medium text-green-400">
+                {selectedTier ? tiers.find(t => t.id === selectedTier)?.payout : "$0"}
+              </span>
+            </div>
+            
+            {selectedTier && (
+              <div 
+                className="flex justify-between items-center p-4 rounded-xl bg-green-500/10 border border-green-500/20 cursor-pointer hover:bg-green-500/20 transition-colors"
+                onClick={() => setRoundUp(!roundUp)}
+              >
+                <div className="flex flex-col gap-1">
+                  <span className="text-sm font-medium text-green-400 flex items-center gap-2">
+                    🌱 Round-Up to Cause
+                  </span>
+                  <span className="text-xs text-green-400/70">Round up to nearest dollar for Climate Action</span>
+                </div>
+                <div className={`w-10 h-6 rounded-full flex items-center p-1 transition-colors ${roundUp ? 'bg-green-500' : 'bg-black/50 border border-green-500/50'}`}>
+                  <div className={`w-4 h-4 bg-white rounded-full transition-transform ${roundUp ? 'translate-x-4' : ''}`}></div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="mt-8 pt-6 border-t border-white/20 relative z-10">
+            <div className="flex justify-between items-center mb-8">
+              <span className="text-lg text-white/80">Total Premium</span>
+              <span className="text-3xl font-heading italic text-white">
+                {selectedTier ? (
+                  roundUp 
+                    ? Math.ceil(parseFloat(tiers.find(t => t.id === selectedTier)!.premiumValue)).toFixed(2) + " cUSD"
+                    : tiers.find(t => t.id === selectedTier)?.premium 
+                ) : "0.00 cUSD"}
+              </span>
+            </div>
+            
+            <div className="flex flex-col gap-3">
+              {isConnected && isCorrectChain && cusdBalance !== undefined && (cusdBalance as bigint) < parseUnits("3", 18) && (
+                <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 mb-2">
+                  <p className="text-red-400 text-xs text-center mb-2">You don't have enough Test cUSD!</p>
+                  <button onClick={handleFaucet} className="w-full py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg text-sm font-medium transition-colors border border-red-500/30">
+                    Faucet: Get 5 Test cUSD
+                  </button>
+                </div>
+              )}
+              
+              {!isConnected ? (
+                <button onClick={() => {}} className="w-full py-4 rounded-full font-medium text-black transition-all flex items-center justify-center gap-2 bg-white hover:bg-white/90">
+                  Connect Wallet to Buy
+                </button>
+              ) : !isCorrectChain ? (
+                <button onClick={() => switchChain({ chainId: 42220 })} className="w-full py-4 rounded-full font-medium text-white transition-all flex items-center justify-center gap-2 bg-red-500 hover:bg-red-400 shadow-[0_0_15px_rgba(239,68,68,0.4)]">
+                  Switch to Celo Mainnet
+                </button>
+              ) : (
+                <>
+                  <button 
+                    onClick={handleApprove}
+                    disabled={!flightNumber || !date || !passengerName || !passengerEmail || !selectedTier || !needsApproval || (isPending && txType === 'approving') || (isTxConfirming && txType === 'approving')}
+                    className={`w-full py-4 rounded-full font-medium transition-all flex items-center justify-center gap-2 ${
+                      !needsApproval ? "bg-green-500/20 text-green-400 border border-green-500/50" : 
+                      "bg-yellow-400 hover:bg-yellow-300 text-black"
+                    } disabled:opacity-50 disabled:cursor-not-allowed`}
+                  >
+                    {isPending && txType === 'approving' ? (
+                      <><Activity className="animate-spin" size={18} /> Check Wallet Popup...</>
+                    ) : isTxConfirming && txType === 'approving' ? (
+                      <><Activity className="animate-spin" size={18} /> Confirming on Chain...</>
+                    ) : !needsApproval ? (
+                      <><CheckCircle size={18} /> cUSD Approved</>
+                    ) : (
+                      "Step 1: Approve cUSD"
+                    )}
+                  </button>
+                  
+                  <button 
+                    onClick={handleMint}
+                    disabled={!flightNumber || !date || !passengerName || !passengerEmail || !selectedTier || needsApproval || (isPending && txType === 'minting') || (isTxConfirming && txType === 'minting') || (isTxSuccess && txType === 'minting')}
+                    className={`w-full py-4 rounded-full font-medium transition-all flex items-center justify-center gap-2 ${
+                      (isTxSuccess && txType === 'minting') ? "bg-green-500 text-white shadow-[0_0_15px_rgba(34,197,94,0.4)]" :
+                      "bg-white hover:bg-white/90 text-black"
+                    } disabled:opacity-50 disabled:cursor-not-allowed`}
+                  >
+                    {isPending && txType === 'minting' ? (
+                      <><Activity className="animate-spin" size={18} /> Check Wallet Popup...</>
+                    ) : isTxConfirming && txType === 'minting' ? (
+                      <><Activity className="animate-spin" size={18} /> Confirming on Chain...</>
+                    ) : (isTxSuccess && txType === 'minting') ? (
+                      <><CheckCircle size={18} /> Policy Minted Successfully! 🎉</>
+                    ) : (
+                      "Step 2: Pay & Mint Policy NFT"
+                    )}
+                  </button>
+                </>
               )}
             </div>
 
-            <div className="mt-8 pt-6 border-t border-white/20 relative z-10">
-              <div className="flex justify-between items-center mb-8">
-                <span className="text-lg text-white/80">Total Premium</span>
-                <span className="text-3xl font-heading italic text-white">
-                  {selectedTier ? (
-                    roundUp 
-                      ? Math.ceil(parseFloat(tiers.find(t => t.id === selectedTier)!.premiumValue)).toFixed(2) + " cUSD"
-                      : tiers.find(t => t.id === selectedTier)?.premium 
-                  ) : "0.00 cUSD"}
-                </span>
-              </div>
+            <div className="mt-6 flex flex-col items-center justify-center gap-4 text-sm w-full">
+              {(txHash && txType === 'minting') && (
+                <a href={`https://celoscan.io/tx/${txHash}`} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 underline underline-offset-4 flex items-center gap-1">
+                  {isTxConfirming ? "View Pending Tx on Block Explorer" : "View Confirmed Tx on Block Explorer"}
+                </a>
+              )}
               
-              <div className="flex flex-col gap-3">
-                {isConnected && isCorrectChain && cusdBalance !== undefined && (cusdBalance as bigint) < parseUnits("3", 18) && (
-                  <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 mb-2">
-                    <p className="text-red-400 text-xs text-center mb-2">You don't have enough Test cUSD!</p>
-                    <button onClick={handleFaucet} className="w-full py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg text-sm font-medium transition-colors border border-red-500/30">
-                      Faucet: Get 5 Test cUSD
-                    </button>
-                  </div>
-                )}
-                
-                {!isConnected ? (
-                  <button onClick={() => {}} className="w-full py-4 rounded-full font-medium text-black transition-all flex items-center justify-center gap-2 bg-white hover:bg-white/90">
-                    Connect Wallet to Buy
-                  </button>
-                ) : !isCorrectChain ? (
-                  <button onClick={() => switchChain({ chainId: 42220 })} className="w-full py-4 rounded-full font-medium text-white transition-all flex items-center justify-center gap-2 bg-red-500 hover:bg-red-400 shadow-[0_0_15px_rgba(239,68,68,0.4)]">
-                    Switch to Celo Mainnet
-                  </button>
-                ) : (
-                  <>
-                    <button 
-                      onClick={handleApprove}
-                      disabled={!flightNumber || !date || !passengerName || !passengerEmail || !selectedTier || !needsApproval || (isPending && txType === 'approving') || (isTxConfirming && txType === 'approving')}
-                      className={`w-full py-4 rounded-full font-medium transition-all flex items-center justify-center gap-2 ${
-                        !needsApproval ? "bg-green-500/20 text-green-400 border border-green-500/50" : 
-                        "bg-yellow-400 hover:bg-yellow-300 text-black"
-                      } disabled:opacity-50 disabled:cursor-not-allowed`}
-                    >
-                      {isPending && txType === 'approving' ? (
-                        <><Activity className="animate-spin" size={18} /> Check Wallet Popup...</>
-                      ) : isTxConfirming && txType === 'approving' ? (
-                        <><Activity className="animate-spin" size={18} /> Confirming on Chain...</>
-                      ) : !needsApproval ? (
-                        <><CheckCircle size={18} /> cUSD Approved</>
-                      ) : (
-                        "Step 1: Approve cUSD"
-                      )}
-                    </button>
-                    
-                    <button 
-                      onClick={handleMint}
-                      disabled={!flightNumber || !date || !passengerName || !passengerEmail || !selectedTier || needsApproval || (isPending && txType === 'minting') || (isTxConfirming && txType === 'minting') || (isTxSuccess && txType === 'minting')}
-                      className={`w-full py-4 rounded-full font-medium transition-all flex items-center justify-center gap-2 ${
-                        (isTxSuccess && txType === 'minting') ? "bg-green-500 text-white shadow-[0_0_15px_rgba(34,197,94,0.4)]" :
-                        "bg-white hover:bg-white/90 text-black"
-                      } disabled:opacity-50 disabled:cursor-not-allowed`}
-                    >
-                      {isPending && txType === 'minting' ? (
-                        <><Activity className="animate-spin" size={18} /> Check Wallet Popup...</>
-                      ) : isTxConfirming && txType === 'minting' ? (
-                        <><Activity className="animate-spin" size={18} /> Confirming on Chain...</>
-                      ) : (isTxSuccess && txType === 'minting') ? (
-                        <><CheckCircle size={18} /> Policy Minted Successfully! 🎉</>
-                      ) : (
-                        "Step 2: Pay & Mint Policy NFT"
-                      )}
-                    </button>
-                  </>
-                )}
-              </div>
-
-              <div className="mt-6 flex flex-col items-center justify-center gap-4 text-sm w-full">
-                {(txHash && txType === 'minting') && (
-                  <a href={`https://celoscan.io/tx/${txHash}`} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 underline underline-offset-4 flex items-center gap-1">
-                    {isTxConfirming ? "View Pending Tx on Block Explorer" : "View Confirmed Tx on Block Explorer"}
+              {(isTxSuccess && txType === 'minting' && txHash) && (
+                <>
+                  <a 
+                     href={`/certificate/${txHash}`}
+                    className="w-full py-3 rounded-full bg-white/10 hover:bg-white/20 border border-white/30 text-white font-medium text-center text-sm flex items-center justify-center gap-2 transition-all mt-2"
+                  >
+                    📄 View & Download Policy Certificate
                   </a>
-                )}
-                
-                {(isTxSuccess && txType === 'minting' && txHash) && (
-                  <>
-                    <a 
-                       href={`/certificate/${txHash}`}
-                      className="w-full py-3 rounded-full bg-white/10 hover:bg-white/20 border border-white/30 text-white font-medium text-center text-sm flex items-center justify-center gap-2 transition-all mt-2"
-                    >
-                      📄 View & Download Policy Certificate
-                    </a>
-                    <a 
-                      href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`Just secured my flight ${flightNumber} on-chain with TravelShield! 🛡️✈️\n\n🔗 Transaction: https://celoscan.io/tx/${txHash}\n\nGet your own autonomous flight insurance at: https://celo-travel.vercel.app\n\n#TravelShield #Celo #Web3 #BuildOnCelo`)}`}
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="w-full py-3 rounded-full bg-[#1DA1F2]/10 hover:bg-[#1DA1F2]/20 border border-[#1DA1F2]/50 text-[#1DA1F2] font-medium text-center text-sm flex items-center justify-center gap-2 transition-all"
-                    >
-                      <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-                      Share on X
-                    </a>
-                  </>
-                )}
-              </div>
-
-              <p className="text-center text-xs text-white/30 mt-4 font-light">
-                Securely processed via Celo Smart Contracts. No intermediary.
-              </p>
+                  <a 
+                    href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`Just secured my flight ${flightNumber} on-chain with TravelShield! 🛡️✈️\n\n🔗 Transaction: https://celoscan.io/tx/${txHash}\n\nGet your own autonomous flight insurance at: https://celo-travel.vercel.app\n\n#TravelShield #Celo #Web3 #BuildOnCelo`)}`}
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="w-full py-3 rounded-full bg-[#1DA1F2]/10 hover:bg-[#1DA1F2]/20 border border-[#1DA1F2]/50 text-[#1DA1F2] font-medium text-center text-sm flex items-center justify-center gap-2 transition-all"
+                  >
+                    <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                    Share on X
+                  </a>
+                </>
+              )}
             </div>
-          </motion.div>
-        </div>
-      </main>
-    </div>
+
+            <p className="text-center text-xs text-white/30 mt-4 font-light">
+              Securely processed via Celo Smart Contracts. No intermediary.
+            </p>
+          </div>
+        </motion.div>
+      </div>
+    </DashboardShell>
   );
 }

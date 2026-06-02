@@ -6,8 +6,9 @@ import { Plane, AlertCircle, CheckCircle2, Clock, ShieldAlert } from "lucide-rea
 import { useAccount, useReadContract } from "wagmi";
 import { parseAbi } from "viem";
 import Link from "next/link";
+import { DashboardShell } from "@/components/DashboardShell";
 
-const POLICY_NFT_ADDRESS = ("0xb37d83B8f7260b83aAc7013c2c09b329eE37986C" as string).trim() as `0x${string}`;
+const POLICY_NFT_ADDRESS = (process.env.NEXT_PUBLIC_POLICY_NFT_ADDRESS || "0xeBa31f2f2BcEe6089adDE62dd69c1B05f5092e3A").trim() as `0x${string}`;
 
 const abi = parseAbi([
   'function balanceOf(address owner) external view returns (uint256)',
@@ -151,43 +152,41 @@ export default function MyPoliciesPage() {
 
   const numPolicies = balance ? Number(balance) : 0;
 
-  if (!mounted) return <div className="min-h-screen bg-black" />;
+  if (!mounted) return null;
 
   return (
-    <div className="min-h-screen flex flex-col bg-black text-white font-body overflow-x-hidden">
-      <main className="flex-1 pt-32 pb-20 px-6 sm:px-8 max-w-7xl mx-auto w-full relative z-10">
-        <motion.div custom={0} initial="hidden" animate="visible" variants={fadeUp} className="mb-16">
-          <h1 className="text-5xl md:text-6xl font-heading italic mb-6">
-            My Active Policies
-          </h1>
-          <p className="text-lg font-light text-white/60 max-w-2xl">
-            View your minted TravelShield NFTs. Real-time flight tracking is active. Payouts are executed autonomously if conditions are met.
-          </p>
-        </motion.div>
+    <DashboardShell activeTab="policies">
+      <motion.div custom={0} initial="hidden" animate="visible" variants={fadeUp} className="mb-16">
+        <h1 className="text-5xl md:text-6xl font-heading italic mb-6">
+          My Active Policies
+        </h1>
+        <p className="text-lg font-light text-white/60 max-w-2xl">
+          View your minted TravelShield NFTs. Real-time flight tracking is active. Payouts are executed autonomously if conditions are met.
+        </p>
+      </motion.div>
 
-        {!isConnected ? (
-          <motion.div custom={1} initial="hidden" animate="visible" variants={fadeUp} className="liquid-glass rounded-3xl p-12 text-center max-w-2xl mx-auto flex flex-col items-center">
-            <ShieldAlert size={48} className="text-white/20 mb-6" />
-            <h2 className="text-2xl font-heading italic mb-4">Wallet Not Connected</h2>
-            <p className="text-white/60 mb-8">Please connect your wallet to view your minted policies.</p>
-          </motion.div>
-        ) : numPolicies === 0 ? (
-          <motion.div custom={1} initial="hidden" animate="visible" variants={fadeUp} className="liquid-glass rounded-3xl p-12 text-center max-w-2xl mx-auto flex flex-col items-center">
-            <Plane size={48} className="text-white/20 mb-6" />
-            <h2 className="text-2xl font-heading italic mb-4">No Active Policies</h2>
-            <p className="text-white/60 mb-8">You haven't minted any flight delay policies on this wallet yet.</p>
-            <Link href="/buy-policy" className="liquid-glass-strong rounded-full px-8 py-4 text-white hover:text-yellow-400 hover:border-yellow-400 transition-all border border-transparent">
-              Buy a Policy Now
-            </Link>
-          </motion.div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {Array.from({ length: numPolicies }).map((_, i) => (
-              <PolicyCard key={i} owner={address!} index={i} />
-            ))}
-          </div>
-        )}
-      </main>
-    </div>
+      {!isConnected ? (
+        <motion.div custom={1} initial="hidden" animate="visible" variants={fadeUp} className="liquid-glass rounded-3xl p-12 text-center max-w-2xl mx-auto flex flex-col items-center">
+          <ShieldAlert size={48} className="text-white/20 mb-6" />
+          <h2 className="text-2xl font-heading italic mb-4">Wallet Not Connected</h2>
+          <p className="text-white/60 mb-8">Please connect your wallet to view your minted policies.</p>
+        </motion.div>
+      ) : numPolicies === 0 ? (
+        <motion.div custom={1} initial="hidden" animate="visible" variants={fadeUp} className="liquid-glass rounded-3xl p-12 text-center max-w-2xl mx-auto flex flex-col items-center">
+          <Plane size={48} className="text-white/20 mb-6" />
+          <h2 className="text-2xl font-heading italic mb-4">No Active Policies</h2>
+          <p className="text-white/60 mb-8">You haven't minted any flight delay policies on this wallet yet.</p>
+          <Link href="/buy-policy" className="liquid-glass-strong rounded-full px-8 py-4 text-white hover:text-yellow-400 hover:border-yellow-400 transition-all border border-transparent">
+            Buy a Policy Now
+          </Link>
+        </motion.div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {Array.from({ length: numPolicies }).map((_, i) => (
+            <PolicyCard key={i} owner={address!} index={i} />
+          ))}
+        </div>
+      )}
+    </DashboardShell>
   );
 }

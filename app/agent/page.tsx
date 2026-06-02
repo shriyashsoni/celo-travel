@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Bot, Send, Sparkles, User, RefreshCcw } from "lucide-react";
 import { useAccount } from "wagmi";
+import { DashboardShell } from "@/components/DashboardShell";
 
 interface Message {
   role: "user" | "assistant" | "system";
