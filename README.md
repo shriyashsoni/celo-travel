@@ -11,6 +11,18 @@
 
 <br />
 
+## 🏆 Hackathon Submission Details
+
+This project is built and submitted for the **CeloDevs Agent Hackathon 🟡**
+
+* **Live Platform URL**: [https://www.travelshield.xyz](https://www.travelshield.xyz)
+* **Karma Project Profile**: [TravelShield on Karma](https://www.karmahq.xyz/project/travelshield--celo-defai-super-app)
+* **On-Chain Agent Registry (ERC-8004)**: [Agent 9179 on 8004scan](https://8004scan.io/agent/9179)
+* **Agent Signer Wallet**: `0x31541C01Bb04A76647fc40B8288E6FD7Df919aAE`
+* **Agent Scanner Registry (agentscan)**: `9179`
+
+---
+
 ## 📖 The Story Behind TravelShield
 The archaic, paper-heavy travel insurance industry is broken. Travelers spend hours filling out forms and waiting months for claim approvals—often for mere fractions of what they are owed. Especially for emerging markets, volatile local currencies and high fees make cross-border travel finances a nightmare.
 
