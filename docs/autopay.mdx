@@ -1,0 +1,15 @@
+---
+title: "Autopay System"
+description: "Automatically secure coverage renewals using pre-approved token allowances."
+---
+
+For business travelers and frequent flyers, manually buying policies for every flight booking is inefficient. The Autopay renewal system enables automated flight protection using ERC-20 token pre-allowance limits.
+
+## Token Allowance Approvals
+
+Under Autopay, users authorize a specified allowance cap (e.g., 20 cUSD) to the TravelShield router contract. You retain custody of your assets; the contract only initiates a withdrawal when a flight ticket purchase is matched with your user profile details.
+
+## Automated Triggers
+
+When our tracking agent confirms a new booking registered to your decentralized ID, the protocol calls `autopayCover` on-chain, automatically creating a new parametric policy NFT without forcing you to manually confirm the wallet popup during travel booking.
+---

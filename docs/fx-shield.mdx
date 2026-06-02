@@ -1,0 +1,14 @@
+---
+title: "FX Volatility Shield"
+description: "Protect fiat values of insurance payouts from currency fluctuations."
+---
+
+Travelers budget and pay for trips in their home currency (EUR, INR, GBP, etc.). While cUSD is a solid USD stablecoin peg, local exchange rate fluctuations between the policy purchase time and the landing time can cause losses in absolute insurance values.
+
+## The Shielding Mechanism
+
+FX Shield allows travelers to lock in local currency values. If the local currency drops relative to cUSD during flight coverage, the contract calculates the premium difference and pays out extra cUSD to guarantee that the absolute purchasing power is maintained upon settlement.
+
+## Supported FX Oracles
+
+We consume price feeds from **Chainlink FX Oracles** and the native **Celo Mento exchange oracle** to derive high-frequency price updates between fiat tokens and stable assets.

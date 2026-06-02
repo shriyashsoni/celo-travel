@@ -1,0 +1,44 @@
+{
+  "$schema": "https://mintlify.com/schema.json",
+  "name": "TravelShield",
+  "logo": {
+    "light": "logo.png",
+    "dark": "logo.png"
+  },
+  "favicon": "favicon.ico",
+  "colors": {
+    "primary": "#3b82f6",
+    "light": "#60a5fa",
+    "dark": "#1e3a8a",
+    "anchors": {
+      "from": "#3b82f6",
+      "to": "#a855f7"
+    }
+  },
+  "navigation": [
+    {
+      "group": "Get Started",
+      "pages": [
+        "introduction",
+        "quickstart",
+        "how-it-works"
+      ]
+    },
+    {
+      "group": "Core Features",
+      "pages": [
+        "parametric-insurance",
+        "ai-oracle",
+        "savings-yield",
+        "autopay",
+        "fx-shield"
+      ]
+    },
+    {
+      "group": "Developer Resources",
+      "pages": [
+        "smart-contracts"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,175 @@
+---
+title: "Smart Contracts"
+description: "Direct reference to the core Solidity smart contracts deployed on Celo Sepolia."
+---
+
+TravelShield's core smart contracts are deployed on the Celo Network. Below is the complete source code for both contracts.
+
+## InsurancePool.sol
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "./PolicyNFT.sol";
+
+contract InsurancePool is Ownable {
+    IERC20 public cUSD;
+    PolicyNFT public policyNFT;
+    
+    address public agentWallet; // ERC-8004 agent wallet
+    
+    // Payout Tiers
+    uint256 public constant TIER_1_PAYOUT = 5 * 10**18;  // $5 cUSD
+    uint256 public constant TIER_2_PAYOUT = 15 * 10**18; // $15 cUSD
+    uint256 public constant TIER_3_PAYOUT = 30 * 10**18; // $30 cUSD
+    
+    // Premium Tiers
+    uint256 public constant TIER_1_PREMIUM = 0.5 * 10**18; // $0.50 cUSD
+    uint256 public constant TIER_2_PREMIUM = 1.5 * 10**18; // $1.50 cUSD
+    uint256 public constant TIER_3_PREMIUM = 3.0 * 10**18; // $3.00 cUSD
+
+    event PremiumPaid(address indexed policyholder, uint256 amount, uint8 tier, uint256 tokenId);
+    event ClaimSettled(uint256 indexed tokenId, string flightId, uint256 amount, address recipient);
+    event FundsDeposited(address indexed sender, uint256 amount);
+    event FundsWithdrawn(address indexed owner, uint256 amount);
+
+    modifier onlyAgent() {
+        require(msg.sender == agentWallet, "Only agent can call this");
+        _;
+    }
+
+    constructor(
+        address _cUSD, 
+        address _policyNFT, 
+        address _agentWallet
+    ) Ownable(msg.sender) {
+        cUSD = IERC20(_cUSD);
+        policyNFT = PolicyNFT(_policyNFT);
+        agentWallet = _agentWallet;
+    }
+
+    function setAgentWallet(address _agentWallet) external onlyOwner {
+        agentWallet = _agentWallet;
+    }
+
+    function depositFunds(uint256 amount) external {
+        require(cUSD.transferFrom(msg.sender, address(this), amount), "Transfer failed");
+        emit FundsDeposited(msg.sender, amount);
+    }
+    
+    function withdrawFunds(uint256 amount) external onlyOwner {
+        require(cUSD.transfer(owner(), amount), "Transfer failed");
+        emit FundsWithdrawn(owner(), amount);
+    }
+
+    function buyPolicy(string calldata flightId, uint8 tier, uint256 expiry) external {
+        require(tier >= 1 && tier <= 3, "Invalid tier");
+        require(expiry > block.timestamp, "Expiry must be in future");
+        
+        uint256 premiumAmount;
+        if (tier == 1) premiumAmount = TIER_1_PREMIUM;
+        else if (tier == 2) premiumAmount = TIER_2_PREMIUM;
+        else if (tier == 3) premiumAmount = TIER_3_PREMIUM;
+
+        require(cUSD.transferFrom(msg.sender, address(this), premiumAmount), "Premium payment failed");
+        uint256 tokenId = policyNFT.mintPolicy(msg.sender, flightId, tier, expiry);
+        emit PremiumPaid(msg.sender, premiumAmount, tier, tokenId);
+    }
+
+    function payout(uint256 tokenId) external onlyAgent {
+        PolicyNFT.Policy memory policy = policyNFT.getPolicy(tokenId);
+        require(!policy.isClaimed, "Policy already claimed");
+        require(block.timestamp <= policy.expiry, "Policy expired");
+        
+        address policyholder = policyNFT.ownerOf(tokenId);
+        
+        uint256 payoutAmount;
+        if (policy.tier == 1) payoutAmount = TIER_1_PAYOUT;
+        else if (policy.tier == 2) payoutAmount = TIER_2_PAYOUT;
+        else if (policy.tier == 3) payoutAmount = TIER_3_PAYOUT;
+
+        require(cUSD.balanceOf(address(this)) >= payoutAmount, "Insufficient pool funds");
+        policyNFT.markAsClaimed(tokenId);
+        require(cUSD.transfer(policyholder, payoutAmount), "Payout failed");
+        emit ClaimSettled(tokenId, policy.flightId, payoutAmount, policyholder);
+    }
+}
+```
+
+## PolicyNFT.sol
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+
+contract PolicyNFT is ERC721Enumerable, Ownable {
+    uint256 private _nextTokenId;
+
+    struct Policy {
+        string flightId; // e.g., "AA123-20260525"
+        uint8 tier;      // 1: 2h delay, 2: 4h delay, 3: cancelled
+        uint256 expiry;  // timestamp of flight arrival + buffer
+        bool isClaimed;
+    }
+
+    mapping(uint256 => Policy) public policies;
+    
+    // Address of InsurancePool that is authorized to mint policies
+    address public minter;
+
+    event PolicyMinted(uint256 indexed tokenId, address indexed policyholder, string flightId, uint8 tier, uint256 expiry);
+    event PolicyClaimed(uint256 indexed tokenId);
+
+    constructor() ERC721("TravelShield Policy", "TSP") Ownable(msg.sender) {}
+
+    function setMinter(address _minter) external onlyOwner {
+        minter = _minter;
+    }
+
+    modifier onlyMinter() {
+        require(msg.sender == minter, "Not authorized to mint");
+        _;
+    }
+
+    function mintPolicy(
+        address to,
+        string calldata flightId,
+        uint8 tier,
+        uint256 expiry
+    ) external onlyMinter returns (uint256) {
+        uint256 tokenId = _nextTokenId++;
+        
+        policies[tokenId] = Policy({
+            flightId: flightId,
+            tier: tier,
+            expiry: expiry,
+            isClaimed: false
+        });
+
+        _mint(to, tokenId);
+        
+        emit PolicyMinted(tokenId, to, flightId, tier, expiry);
+        return tokenId;
+    }
+
+    function markAsClaimed(uint256 tokenId) external onlyMinter {
+        ownerOf(tokenId); // Reverts if token does not exist
+        require(!policies[tokenId].isClaimed, "Policy already claimed");
+        
+        policies[tokenId].isClaimed = true;
+        
+        emit PolicyClaimed(tokenId);
+    }
+    
+    function getPolicy(uint256 tokenId) external view returns (Policy memory) {
+        ownerOf(tokenId); // Reverts if token does not exist
+        return policies[tokenId];
+    }
+}
+```

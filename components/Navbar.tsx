@@ -31,12 +31,9 @@ export default function Navbar() {
 
   const navLinks = [
     { name: "Home", href: "/" },
-    { name: "Buy Policy", href: "/buy-policy" },
-    { name: "My Policies", href: "/policies" },
-    { name: "AI Agent", href: "/agent" },
-    { name: "Savings", href: "/savings" },
-    { name: "Autopay", href: "/autopay" },
-    { name: "FX Shield", href: "/fx-shield" },
+    ...(isConnected ? [{ name: "Dashboard", href: "/admin" }] : []),
+    { name: "Docs", href: "/docs" },
+    { name: "Whitepaper", href: "/whitepaper" },
   ];
 
   return (

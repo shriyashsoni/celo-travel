@@ -1,0 +1,48 @@
+---
+title: "Quickstart Guide"
+description: "Get up and running with TravelShield in less than 5 minutes."
+---
+
+Learn how to connect your wallet, fund it with native Celo assets, purchase flight delay insurance, and observe active tracking.
+
+## 1. Setup Web3 Wallet
+
+TravelShield uses standard Web3 connections. You can use standard Celo-supporting wallets such as **Valora**, **MetaMask**, or **Rainbow Wallet**.
+
+### Connecting to Celo Alfajores Testnet (for testing)
+
+Add the following network specs to your custom RPC configuration in MetaMask:
+
+```text
+Network Name: Celo Alfajores Testnet
+New RPC URL: https://alfajores-forno.celo-testnet.org
+Chain ID: 44787
+Currency Symbol: CELO
+Block Explorer URL: https://alfajores.celoscan.io
+```
+
+## 2. Acquire cUSD & CELO
+
+Premium payments are processed in **cUSD** (Celo Dollar stablecoin). A fraction of **CELO** is required to pay network transaction (gas) fees.
+
+* **Testnet Faucet:** Get free test CELO and cUSD from the [Celo Faucet](https://faucet.celo.org).
+* **Mainnet:** Purchase CELO and cUSD via decentralized exchanges (Ubeswap) or centralized exchanges (Binance, Coinbase) and send them to your Celo wallet address.
+
+## 3. Purchase Flight Policy
+
+Navigate to the dashboard navigation hub and click on **Buy Policy**. Follow the fields:
+
+1. Enter your flight number (e.g. `LH430` for Lufthansa flight 430).
+2. Select your coverage tier (Tier 1, Tier 2, or Tier 3).
+3. Approve the cUSD spending allowance inside your wallet extension.
+4. Submit the `buyPolicy` transaction to mint your parametric policy NFT.
+
+<Tip>
+  Once minted, your policy details are encoded directly inside an ERC-721 token. You can verify it under the "My Policies" page or look up the transaction on CeloScan.
+</Tip>
+
+## 4. Automatic Payout Monitoring
+
+Once your policy is active, you don't need to check in. Our decentralized oracle agents run background queries on landing updates.
+
+Upon landing, if AviationStack marks the flight as delayed by more than your tier limit, the oracle signs an approval token triggering the payout on the pool smart contract. The cUSD is immediately wired to your address.

@@ -1,0 +1,17 @@
+---
+title: "cUSD Savings Yield"
+description: "Generate DeFi interest from locked premium reserves to reduce traveler costs."
+---
+
+When users purchase flight insurance policies, the premium capital goes to the `InsurancePool` reserve. Instead of keeping this capital idle, the protocol channels a percentage of reserve funds into audited Celo stablecoin yield protocols.
+
+## DeFi Yield Protocols
+
+By deploying cUSD capital into automated Celo platforms (e.g. Moola Market, Aave V3 market instances on Celo), the pool generates interest continuously. The accrued interest is used to:
+
+* Subsidize premium rates for travelers.
+* Buffer the insurance pool reserves, making it more resilient to mass cancellation anomalies (e.g. volcanic eruptions or global IT outages).
+
+## Ensuring Payout Liquidity
+
+To guarantee that there is always immediately checkable cUSD to cover payouts, the contract locks a minimum liquidity ratio (e.g., 30% of total assets) in liquid reserves, keeping only the remaining 70% in yield-bearing positions.

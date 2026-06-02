@@ -1,0 +1,73 @@
+---
+title: "AI Oracle & APIs"
+description: "Review oracle routing mechanisms and live chat APIs."
+---
+
+TravelShield uses Next.js server routes to interface with external APIs (AviationStack) and AI inference providers (Groq Cloud).
+
+## AI Oracle API Route (`/api/oracle`)
+
+This endpoint triggers a database fetch for a flight status and processes it through a Llama-3 model to determine payout eligibility.
+
+```javascript
+import { NextResponse } from 'next/server';
+
+export async function POST(req: Request) {
+  try {
+    const { flightId, tokenId } = await req.json();
+
+    // 1. Fetch Real Flight Data from AviationStack
+    const flightRes = await fetch(`http://api.aviationstack.com/v1/flights?access_key=${process.env.AVIATIONSTACK_API_KEY}&flight_iata=${flightId}`);
+    const flightData = await flightRes.json();
+    
+    let flightStatus = "active";
+    let delayMinutes = 0;
+
+    if (flightData && flightData.data && flightData.data.length > 0) {
+      const flight = flightData.data[0];
+      flightStatus = flight.flight_status;
+      if (flight.departure && flight.departure.delay) {
+        delayMinutes = flight.departure.delay;
+      }
+    }
+
+    // 2. Use Groq AI to process rules
+    const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: "llama-3.1-8b-instant",
+        messages: [
+          {
+            role: "system",
+            content: "You are an autonomous smart contract oracle agent. Output only JSON with 'qualifiesForPayout' (boolean) and 'reason' (string)."
+          },
+          {
+            role: "user",
+            content: `Flight ${flightId}. Status is '${flightStatus}' with ${delayMinutes} mins delay. Policy requires cancellation or >120m delay.`
+          }
+        ],
+        response_format: { type: "json_object" }
+      })
+    });
+
+    const groqData = await groqRes.json();
+    const decision = JSON.parse(groqData.choices[0].message.content);
+    return NextResponse.json({ success: true, flightData, decision });
+  } catch (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+```
+
+## AI Chat Agent Route (`/api/agent-chat`)
+
+Provides users with interactive support regarding travel coverage, savings metrics, and standard DeFi swaps.
+
+* **Model Used:** `llama-3.1-8b-instant` via Groq
+* **Target Pool Contract:** `0x89FDD0Ad4bd2B2c48ECB39A6f636Af000F56Abe6`
+* **Target Policy NFT:** `0xb37d83B8f7260b83aAc7013c2c09b329eE37986C`
+* **Stablecoin Peg:** cUSD (`0x765DE816845861e75A25fCA122bb6898B8B1282a`)
