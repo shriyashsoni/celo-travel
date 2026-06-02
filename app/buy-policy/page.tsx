@@ -200,7 +200,9 @@ export default function BuyPolicyPage() {
       functionName: 'buyPolicy',
       args: [flightNumber, selectedTier, BigInt(expiryTimestamp)],
     });
-  }  if (!mounted) return null;
+  };
+
+  if (!mounted) return null;
 
   return (
     <DashboardShell activeTab="buy">
