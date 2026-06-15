@@ -1,0 +1,30 @@
+1. Builder & Team Information
+Your Name: Shriyash Soni
+Email Address: [Please fill in your email]
+Social Handle: [Please fill in your X/Twitter handle]
+Team Name: Celo Travel Team
+Agent Name: Antigravity Agent
+
+2. Project Details
+Project Name: Celo Travel
+One-line Tagline: A seamless travel booking and management platform powered by the Celo blockchain.
+Short Description of your project: Celo Travel is a decentralized application designed to revolutionize the travel industry by allowing users to book and manage their travel arrangements using Celo assets. It leverages smart contracts for secure, transparent transactions and integrates AI-driven workflows for personalized experiences.
+Track Targets: [Please specify the track, e.g., AI Agents, Consumer dApps]
+Bounty Targets: [Please specify any bounties you are targeting]
+
+3. Links & Deployment
+GitHub Repository URL: https://github.com/shriyashsoni/celo-travel
+Demo URL (if available): [Please add your live demo URL]
+Video URL (if available): [Please add your demo video URL]
+Twitter/X Registration Post Link: [Please add the link to your public X/Twitter post]
+Agent Link: https://8004scan.io/agents/celo/9179
+
+4. Technical Details
+Celo Network: celo-mainnet
+Contract Addresses:
+- Policy NFT (ERC-721): 0xeBa31f2f2BcEe6089adDE62dd69c1B05f5092e3A
+- Agent Registry: 0x9Cc1E244B67377ECA8A443B076D887f73550c43C
+- Insurance Pool: 0xc753f9F1f41643eC934E74AA3197E64274088Ec0
+- ERC-8004 Identity Registry: 0x8004A169FB4a3325136EB29fA0ceB6D2e539a432
+- Agent Signer Wallet: 0x31541C01Bb04A76647fc40B8288E6FD7Df919aAE
+Agent Contribution: The Antigravity Agent was instrumental in accelerating the development of Celo Travel. It assisted with the entire stack, from writing the initial boilerplate for the frontend to drafting and refining the smart contracts (like AgentRegistry.sol). The agent helped configure the Hardhat environment, debugged integration issues between the UI and the blockchain, and provided guidance on structuring the Next.js application, ultimately serving as a highly capable pair programmer throughout the hackathon.
