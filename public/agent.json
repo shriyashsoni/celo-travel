@@ -1,5 +1,9 @@
 {
-  "name": "TravelShield AI Agent",
-  "description": "A conversational DeFi agent on Celo that helps users book travel, mint travel insurance, and manage their stablecoin portfolio seamlessly.",
-  "image": "https://celo-travel.vercel.app/agent-image.png"
+  "name": "TravelShield AI",
+  "description": "A conversational DeFi agent on Celo that helps users book travel, mint travel insurance, and manage their stablecoin portfolio seamlessly. Built by Shriyash Soni.",
+  "image": "https://celo-travel.vercel.app/agent-image.png",
+  "services": {
+    "web": "https://celo-travel.vercel.app",
+    "agentUrl": "https://celo-travel.vercel.app/agent"
+  }
 }
