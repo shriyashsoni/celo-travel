@@ -1,7 +1,7 @@
 1. Builder & Team Information
 Your Name: Shriyash Soni
-Email Address: [Please fill in your email]
-Social Handle: [Please fill in your X/Twitter handle]
+Email Address: sonishriyash@gmail.com
+Social Handle: @shriyash_soni (Twitter: https://x.com/shriyash_soni)
 Team Name: Celo Travel Team
 Agent Name: Antigravity Agent
 
@@ -9,14 +9,14 @@ Agent Name: Antigravity Agent
 Project Name: Celo Travel
 One-line Tagline: A seamless travel booking and management platform powered by the Celo blockchain.
 Short Description of your project: Celo Travel is a decentralized application designed to revolutionize the travel industry by allowing users to book and manage their travel arrangements using Celo assets. It leverages smart contracts for secure, transparent transactions and integrates AI-driven workflows for personalized experiences.
-Track Targets: [Please specify the track, e.g., AI Agents, Consumer dApps]
-Bounty Targets: [Please specify any bounties you are targeting]
+Track Targets: CeloDevs Agent Hackathon (Proof of Ship AI Track)
+Bounty Targets: Best Agent Application
 
 3. Links & Deployment
 GitHub Repository URL: https://github.com/shriyashsoni/celo-travel
-Demo URL (if available): [Please add your live demo URL]
-Video URL (if available): [Please add your demo video URL]
-Twitter/X Registration Post Link: [Please add the link to your public X/Twitter post]
+Demo URL (if available): https://youtu.be/NpFf-vPvKpI?si=Yldo2ArqalOJAqx7
+Video URL (if available): https://youtu.be/NpFf-vPvKpI?si=Yldo2ArqalOJAqx7
+Twitter/X Registration Post Link: https://x.com/shriyash_soni/status/2061906057656725734?s=20, https://x.com/shriyash_soni/status/2058118478482285027?s=20
 Agent Link: https://8004scan.io/agents/celo/9179
 
 4. Technical Details
