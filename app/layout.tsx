@@ -17,7 +17,8 @@ export const metadata: Metadata = {
     apple: "/logo.png",
   },
   other: {
-    "talentapp:project_verification": "06381889a1b3e6a4059ad49cac477515542c87cc3e2be4fd6031427dc08d78ff00bddacbd0187e52cd1b72db92776d401308be9d3529e421df1a66b2c2030935"
+    "talentapp:project_verification": "06381889a1b3e6a4059ad49cac477515542c87cc3e2be4fd6031427dc08d78ff00bddacbd0187e52cd1b72db92776d401308be9d3529e421df1a66b2c2030935",
+    "virtual-protocol-site-verification": "ade13e1d108ca004d7f31c88e5cb9bde"
   }
 }
 
