@@ -31,7 +31,7 @@ contract InsurancePool is Ownable {
         _;
     }
 
-    // Default cUSD on Celo Mainnet: 0x765DE816845861e75A25fCA122bb6898B8B1282a
+    // The token address is supplied by the deployment target.
     constructor(
         address _cUSD, 
         address _policyNFT, 

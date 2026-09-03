@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createPublicClient, createWalletClient, http } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
-import { celoSepolia } from 'viem/chains';
 
 const AVIATIONSTACK_API_KEY = process.env.AVIATIONSTACK_API_KEY;
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
@@ -60,7 +59,7 @@ export async function POST(req: Request) {
     const groqData = await groqRes.json();
     const decision = JSON.parse(groqData.choices[0].message.content);
 
-    // 3. If qualifies, execute payout on Celo!
+    // 3. If qualifies, execute payout on BOT Chain.
     let txHash = null;
     if (decision.qualifiesForPayout && PRIVATE_KEY) {
       // Demo execution logic (we would use viem here to sign the payout transaction)

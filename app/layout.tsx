@@ -8,8 +8,8 @@ import Navbar from "@/components/Navbar"
 import "./globals.css"
 
 export const metadata: Metadata = {
-  title: "TravelShield | Parametric Flight Insurance on Celo",
-  description: "AI-powered, automated flight delay insurance paid out in cUSD on the Celo network.",
+  title: "TravelShield | Parametric Flight Insurance on BOT Chain",
+  description: "AI-powered, automated flight delay insurance paid out on BOT Chain.",
   generator: "v0.app",
   icons: {
     icon: "/logo.png",

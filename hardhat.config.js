@@ -11,39 +11,24 @@ export default {
     },
   },
   networks: {
-    alfajores: {
+    botchain: {
       type: "http",
-      url: process.env.CELO_ALFAJORES_RPC || "https://alfajores-forno.celo-testnet.org",
+      url: process.env.BOT_CHAIN_RPC || "https://rpc.botchain.ai",
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
-      chainId: 44787,
-    },
-    celo: {
-      type: "http",
-      url: process.env.CELO_MAINNET_RPC || "https://forno.celo.org",
-      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
-      chainId: 42220,
+      chainId: 677,
     },
   },
   etherscan: {
     apiKey: {
-      alfajores: process.env.CELOSCAN_API_KEY || "YOUR_API_KEY",
-      celo: process.env.CELOSCAN_API_KEY || "YOUR_API_KEY",
+      botchain: process.env.BOTSCAN_API_KEY || "",
     },
     customChains: [
       {
-        network: "alfajores",
-        chainId: 44787,
+        network: "botchain",
+        chainId: 677,
         urls: {
-          apiURL: "https://api-alfajores.celoscan.io/api",
-          browserURL: "https://alfajores.celoscan.io/",
-        },
-      },
-      {
-        network: "celo",
-        chainId: 42220,
-        urls: {
-          apiURL: "https://api.celoscan.io/api",
-          browserURL: "https://celoscan.io/",
+          apiURL: process.env.BOT_CHAIN_EXPLORER_API || "https://scan.botchain.ai/api",
+          browserURL: process.env.BOT_CHAIN_EXPLORER || "https://scan.botchain.ai",
         },
       },
     ],

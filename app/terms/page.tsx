@@ -19,7 +19,7 @@ export default function TermsPage() {
         <section>
           <h2 className="text-2xl font-heading italic text-white mb-4">1. Acceptance of Terms</h2>
           <p>
-            By minting a TravelShield policy NFT, you agree to these Terms and Conditions. Our services involve interacting with smart contracts deployed on the Celo blockchain. You acknowledge that blockchain transactions are irreversible.
+            By minting a TravelShield policy NFT, you agree to these Terms and Conditions. Our services involve interacting with smart contracts deployed on the BOT Chain blockchain. You acknowledge that blockchain transactions are irreversible.
           </p>
         </section>
 
@@ -33,7 +33,7 @@ export default function TermsPage() {
         <section>
           <h2 className="text-2xl font-heading italic text-white mb-4">3. Premium Payments and cUSD</h2>
           <p>
-            All premiums are paid in cUSD (Celo Dollar), and all claims are settled in cUSD. You are responsible for ensuring your wallet holds sufficient funds and gas (CELO) to execute the policy minting transaction.
+            All premiums are paid in the configured project stablecoin, and all claims are settled in that token. You are responsible for ensuring your wallet holds sufficient funds and gas (BOT) to execute the policy minting transaction.
           </p>
         </section>
 

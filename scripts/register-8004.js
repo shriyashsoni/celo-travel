@@ -8,7 +8,7 @@ dotenv.config({ path: path.resolve(process.cwd(), ".env.mainnet") });
 async function main() {
   const REGISTRY_ADDRESS = "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432";
   const AGENT_METADATA_URI = "https://celo-travel.vercel.app/agent.json";
-  const RPC_URL = process.env.CELO_MAINNET_RPC || "https://forno.celo.org";
+  const RPC_URL = process.env.BOT_CHAIN_RPC || "https://rpc.botchain.ai";
   const PRIVATE_KEY = process.env.PRIVATE_KEY;
 
   if (!PRIVATE_KEY) {

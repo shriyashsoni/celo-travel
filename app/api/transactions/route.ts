@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
+import { BOT_CHAIN } from '@/lib/bot-chain';
 
-const CELOSCAN_API_KEY = process.env.CELOSCAN_API_KEY || "A7PZRDK4NTCBJP99CI5KUVVG84UQVCMT2Z";
-const CUSD_MAINNET_ADDRESS = "0x765DE816845861e75A25fCA122bb6898B8B1282a";
+const CUSD_MAINNET_ADDRESS = BOT_CHAIN.tokenAddress;
 
 export async function GET(req: Request) {
   try {
@@ -12,12 +12,12 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "Missing address parameter" }, { status: 400 });
     }
 
-    // Fetch ERC-20 token transfers for cUSD on Celo Mainnet
-    const url = `https://api.celoscan.io/api?module=account&action=tokentx&contractaddress=${CUSD_MAINNET_ADDRESS}&address=${address}&page=1&offset=100&sort=desc&apikey=${CELOSCAN_API_KEY}`;
+    // Fetch ERC-20 token transfers for the configured Bot Chain USD token.
+    const url = `${BOT_CHAIN.explorerApiUrl}?module=account&action=tokentx&contractaddress=${CUSD_MAINNET_ADDRESS}&address=${address}&page=1&offset=100&sort=desc`;
     
     const scanRes = await fetch(url);
     if (!scanRes.ok) {
-      throw new Error("Celoscan API request failed");
+      throw new Error("BOTScan API request failed");
     }
 
     const data = await scanRes.json();

@@ -16,7 +16,7 @@ export default function AgentPage() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: "Hello! I am TravelShield AI, your conversational DeFi agent on Celo. I can help you mint travel insurance, save for your next trip, hedge against currency devaluation, or manage your stablecoin portfolio. How can I help you today?"
+      content: "Hello! I am TravelShield AI, your conversational DeFi agent on BOT Chain. I can help you mint travel insurance, save for your next trip, hedge against currency devaluation, or manage your stablecoin portfolio. How can I help you today?"
     }
   ]);
   const [input, setInput] = useState("");

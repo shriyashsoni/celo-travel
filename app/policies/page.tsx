@@ -8,7 +8,7 @@ import { parseAbi } from "viem";
 import Link from "next/link";
 import { DashboardShell } from "@/components/DashboardShell";
 
-const POLICY_NFT_ADDRESS = (process.env.NEXT_PUBLIC_POLICY_NFT_ADDRESS || "0xeBa31f2f2BcEe6089adDE62dd69c1B05f5092e3A").trim() as `0x${string}`;
+const POLICY_NFT_ADDRESS = (process.env.NEXT_PUBLIC_POLICY_NFT_ADDRESS || "").trim() as `0x${string}`;
 
 const abi = parseAbi([
   'function balanceOf(address owner) external view returns (uint256)',
@@ -121,7 +121,7 @@ function PolicyCard({ owner, index }: { owner: `0x${string}`; index: number }) {
 
       <div className="mt-4">
         <a 
-          href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`Just secured my flight ${flightId} on-chain with TravelShield! 🛡️✈️\n\n🎫 Policy NFT ID: #${tokenId}\n\nGet your own autonomous flight insurance at: https://celo-travel.vercel.app\n\n#TravelShield #Celo #Web3 #BuildOnCelo`)}`}
+          href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`Just secured my flight ${flightId} on-chain with TravelShield! 🛡️✈️\n\n🎫 Policy NFT ID: #${tokenId}\n\nGet your own autonomous flight insurance at: https://celo-travel.vercel.app\n\n#TravelShield #BOTChain #Web3`)}`}
           target="_blank" 
           rel="noopener noreferrer"
           className="w-full py-3 rounded-full border border-white/20 hover:bg-white/10 text-white font-medium text-center text-sm flex items-center justify-center gap-2 transition-all"

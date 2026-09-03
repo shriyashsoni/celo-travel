@@ -29,7 +29,7 @@ export default function AutopayPage() {
         
         if (data.success && data.subscriptions.length > 0) {
           setBills(data.subscriptions);
-          toast.success(`Scanned Celo Mainnet: Found ${data.subscriptions.length} real recurring cUSD transfers!`);
+          toast.success(`Scanned BOT Chain: Found ${data.subscriptions.length} real recurring stablecoin transfers!`);
         } else {
           // Fallback if no real on-chain recurring transactions are found
           setBills([
@@ -66,7 +66,7 @@ export default function AutopayPage() {
               Bill Pay & Subscriptions
             </h1>
             <p className="text-white/60 font-light max-w-2xl">
-              Let the agent scan Celo Mainnet for recurring stablecoin charges, auto-pay your bills, and cancel subscriptions instantly.
+              Let the agent scan BOT Chain for recurring stablecoin charges, auto-pay your bills, and cancel subscriptions instantly.
             </p>
           </div>
           
@@ -79,7 +79,7 @@ export default function AutopayPage() {
           {isLoading ? (
             <div className="flex flex-col items-center justify-center py-20 gap-4">
               <Loader2 className="animate-spin text-orange-400" size={32} />
-              <p className="text-white/60 text-sm">Scanning Celo Mainnet blocks for your cUSD subscriptions...</p>
+              <p className="text-white/60 text-sm">Scanning BOT Chain blocks for your stablecoin subscriptions...</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

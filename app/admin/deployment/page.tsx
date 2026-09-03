@@ -8,7 +8,7 @@ export default function DeploymentPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Smart Contract Deployment</h1>
-        <p className="text-muted-foreground">Manage and monitor FlowTravel Insurance smart contract deployments</p>
+        <p className="text-muted-foreground">Manage and monitor TravelShield smart contract deployments on BOT Chain</p>
       </div>
 
       <DeploymentStatus />
@@ -17,10 +17,10 @@ export default function DeploymentPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              Flow EVM Deployment
+              BOT Chain Deployment
               <Badge variant="outline">Solidity</Badge>
             </CardTitle>
-            <CardDescription>Deploy to Flow EVM networks using Hardhat</CardDescription>
+            <CardDescription>Deploy to BOT Chain using Hardhat</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
@@ -44,7 +44,7 @@ export default function DeploymentPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              Flow Cadence Deployment
+              Legacy Cadence Deployment
               <Badge variant="outline">Cadence</Badge>
             </CardTitle>
             <CardDescription>Deploy to Flow networks using Flow CLI</CardDescription>

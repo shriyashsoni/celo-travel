@@ -71,7 +71,7 @@ export default function DocsPage() {
   // System Configuration Variables
   const POOL_CONTRACT_ADDRESS = "0x89FDD0Ad4bd2B2c48ECB39A6f636Af000F56Abe6"
   const NFT_CONTRACT_ADDRESS = "0xb37d83B8f7260b83aAc7013c2c09b329eE37986C"
-  const CUSD_CONTRACT_ADDRESS = "0x765DE816845861e75A25fCA122bb6898B8B1282a"
+  const CUSD_CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CUSD_ADDRESS || "Not deployed yet"
 
   const articles: Record<string, DocArticle> = {
     introduction: {
@@ -82,17 +82,17 @@ export default function DocsPage() {
         { id: "what-is-travelshield", label: "What is TravelShield?" },
         { id: "why-parametric", label: "Why Parametric?" },
         { id: "core-value", label: "Core Value Propositions" },
-        { id: "celo-advantages", label: "Celo Network Advantages" }
+        { id: "celo-advantages", label: "BOT Chain Advantages" }
       ],
       content: (
         <div className="space-y-8">
           <section id="what-is-travelshield" className="space-y-4">
             <h2 className="text-3xl font-heading italic text-white border-b border-white/10 pb-2">What is TravelShield?</h2>
             <p className="text-white/70 leading-relaxed">
-              TravelShield is a decentralized, autonomous, parametric flight delay insurance protocol built on the **Celo network**. It enables travelers to secure flight delay coverage instantly and receive automatic payouts directly to their Web3 wallets without submitting claims or dealing with manual reviews.
+              TravelShield is a decentralized, autonomous, parametric flight delay insurance protocol built on **BOT Chain**. It enables travelers to secure flight delay coverage instantly and receive automatic payouts directly to their Web3 wallets without submitting claims or dealing with manual reviews.
             </p>
             <p className="text-white/70 leading-relaxed">
-              By using standard decentralized stablecoins like **cUSD (Celo Dollar)** and advanced AI-powered oracles (combining live flight data from AviationStack with Groq LLM reasoning), TravelShield eliminates the traditional operational friction, delays, and lack of transparency associated with traditional travel insurance providers.
+              By using a project stablecoin on BOT Chain and advanced AI-powered oracles (combining live flight data from AviationStack with Groq LLM reasoning), TravelShield eliminates the traditional operational friction, delays, and lack of transparency associated with traditional travel insurance providers.
             </p>
           </section>
 
@@ -122,7 +122,7 @@ export default function DocsPage() {
               </div>
               <div className="liquid-glass border border-white/5 rounded-2xl p-5">
                 <h4 className="font-heading italic text-green-400 mb-2">Hedged Savings Yield</h4>
-                <p className="text-white/60 text-xs leading-relaxed">Locked premium capital generates safe yield within Celo's DeFi system, subsidizing lower costs for travelers.</p>
+                <p className="text-white/60 text-xs leading-relaxed">Locked premium capital generates yield within the BOT Chain ecosystem, subsidizing lower costs for travelers.</p>
               </div>
               <div className="liquid-glass border border-white/5 rounded-2xl p-5">
                 <h4 className="font-heading italic text-pink-400 mb-2">Multi-Currency Protection</h4>
@@ -132,7 +132,7 @@ export default function DocsPage() {
           </section>
 
           <section id="celo-advantages" className="space-y-4">
-            <h2 className="text-3xl font-heading italic text-white border-b border-white/10 pb-2">Celo Network Advantages</h2>
+            <h2 className="text-3xl font-heading italic text-white border-b border-white/10 pb-2">BOT Chain Advantages</h2>
             <ul className="list-disc pl-6 text-white/70 space-y-2 leading-relaxed">
               <li>**Ultra-low Gas Fees:** Transaction costs are typically less than $0.01, allowing micro-insurance policies to remain highly profitable and accessible.</li>
               <li>**Fast Block Times:** Sub-5 second settlement speed ensures payouts occur the moment the AI agent broadcasts the claim approval.</li>
@@ -148,38 +148,38 @@ export default function DocsPage() {
       category: "Get Started",
       toc: [
         { id: "setup-wallet", label: "1. Setup Web3 Wallet" },
-        { id: "acquire-cusd", label: "2. Acquire cUSD & CELO" },
+        { id: "acquire-cusd", label: "2. Acquire project token & BOT" },
         { id: "purchase-policy", label: "3. Purchase Flight Policy" },
         { id: "monitor-status", label: "4. Automatic Payout Monitoring" }
       ],
       content: (
         <div className="space-y-8">
           <p className="text-white/70 leading-relaxed">
-            Get up and running with TravelShield in less than 5 minutes. Learn how to connect your wallet, fund it with native Celo assets, purchase flight delay insurance, and observe active tracking.
+            Get up and running with TravelShield in less than 5 minutes. Learn how to connect your wallet, fund it with BOT, purchase flight delay insurance, and observe active tracking.
           </p>
 
           <section id="setup-wallet" className="space-y-4">
             <h2 className="text-2xl font-heading italic text-white border-b border-white/10 pb-2">1. Setup Web3 Wallet</h2>
             <p className="text-white/70 leading-relaxed">
-              TravelShield uses standard Web3 connections. You can use standard Celo-supporting wallets such as **Valora**, **MetaMask**, or **Rainbow Wallet**.
+              TravelShield uses standard Web3 connections. You can use **MetaMask**, **Rainbow Wallet**, or another wallet that supports custom EVM networks.
             </p>
             <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-              <h4 className="font-medium text-white mb-2">Connecting to Celo Alfajores Testnet (for testing)</h4>
+              <h4 className="font-medium text-white mb-2">Connecting to BOT Chain</h4>
               <p className="text-white/60 text-xs mb-4">Add the following network specs to your custom RPC configuration in MetaMask:</p>
               <pre className="bg-black/80 rounded-xl p-4 text-xs font-mono text-green-400 border border-white/10 overflow-x-auto">
-{`Network Name: Celo Alfajores Testnet
-New RPC URL: https://alfajores-forno.celo-testnet.org
-Chain ID: 44787
-Currency Symbol: CELO
-Block Explorer URL: https://alfajores.celoscan.io`}
+{`Network Name: BOT Chain
+New RPC URL: https://rpc.botchain.ai
+Chain ID: 677
+Currency Symbol: BOT
+Block Explorer URL: https://scan.botchain.ai`}
               </pre>
             </div>
           </section>
 
           <section id="acquire-cusd" className="space-y-4">
-            <h2 className="text-2xl font-heading italic text-white border-b border-white/10 pb-2">2. Acquire cUSD & CELO</h2>
+            <h2 className="text-2xl font-heading italic text-white border-b border-white/10 pb-2">2. Acquire project token & BOT</h2>
             <p className="text-white/70 leading-relaxed">
-              Premium payments are processed in **cUSD** (Celo Dollar stablecoin). A fraction of **CELO** is required to pay network transaction (gas) fees.
+              Premium payments are processed in the project USD token. A fraction of **BOT** is required to pay network transaction fees.
             </p>
             <ul className="list-disc pl-6 text-white/70 space-y-2">
               <li>**Testnet Faucet:** Get free test CELO and cUSD from the [Celo Faucet](https://faucet.celo.org).</li>
@@ -199,7 +199,7 @@ Block Explorer URL: https://alfajores.celoscan.io`}
               <li>Submit the `buyPolicy` transaction to mint your parametric policy NFT.</li>
             </ol>
             <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-4 text-xs text-blue-300">
-              <strong>Tip:</strong> Once minted, your policy details are encoded directly inside an ERC-721 token. You can verify it under the "My Policies" page or look up the transaction on CeloScan.
+              <strong>Tip:</strong> Once minted, your policy details are encoded directly inside an ERC-721 token. You can verify it under the "My Policies" page or look up the transaction on BOTScan.
             </div>
           </section>
 

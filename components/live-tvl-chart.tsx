@@ -49,7 +49,7 @@ export function LiveTVLChart({ currentTVL }: { currentTVL: number }) {
           </div>
         </div>
         <CardDescription className="text-white/50">
-          Historical growth of the Insurance Pool in cUSD across the Celo network.
+          Historical growth of the Insurance Pool in the project stablecoin across BOT Chain.
         </CardDescription>
       </CardHeader>
       

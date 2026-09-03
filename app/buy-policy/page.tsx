@@ -7,9 +7,10 @@ import { useAccount, useReadContract, useWriteContract, useWaitForTransactionRec
 import { parseAbi, parseUnits } from "viem";
 import { toast } from "sonner";
 import { DashboardShell } from "@/components/DashboardShell";
+import { BOT_CHAIN } from "@/lib/bot-chain";
 
-const INSURANCE_POOL_ADDRESS = (process.env.NEXT_PUBLIC_INSURANCE_POOL_ADDRESS || "0xc753f9F1f41643eC934E74AA3197E64274088Ec0").trim() as `0x${string}`;
-const CUSD_ADDRESS = "0x765DE816845861e75A25fCA122bb6898B8B1282a" as `0x${string}`; // Native Celo Mainnet cUSD
+const INSURANCE_POOL_ADDRESS = (process.env.NEXT_PUBLIC_INSURANCE_POOL_ADDRESS || "0x0000000000000000000000000000000000000000").trim() as `0x${string}`;
+const CUSD_ADDRESS = BOT_CHAIN.tokenAddress;
 
 const erc20Abi = parseAbi([
   'function allowance(address owner, address spender) view returns (uint256)',
@@ -38,7 +39,7 @@ export default function BuyPolicyPage() {
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
   const { switchChain } = useSwitchChain();
-  const isCorrectChain = chainId === 42220; // Celo Sepolia Testnet ID
+  const isCorrectChain = chainId === BOT_CHAIN.id;
   
   const [flightNumber, setFlightNumber] = useState("");
   const [date, setDate] = useState("");
@@ -174,7 +175,7 @@ export default function BuyPolicyPage() {
 
   const handleApprove = () => {
     if (!isConnected) return;
-    if (!isCorrectChain) { switchChain({ chainId: 42220 }); return; }
+    if (!isCorrectChain) { switchChain({ chainId: BOT_CHAIN.id }); return; }
     if (!flightNumber || !date || !selectedTier) return;
     setTxType('approving');
     writeContract({
@@ -187,7 +188,7 @@ export default function BuyPolicyPage() {
 
   const handleMint = () => {
     if (!isConnected) return;
-    if (!isCorrectChain) { switchChain({ chainId: 42220 }); return; }
+    if (!isCorrectChain) { switchChain({ chainId: BOT_CHAIN.id }); return; }
     if (!flightNumber || !date || !selectedTier) return;
     setTxType('minting');
     
@@ -427,8 +428,8 @@ export default function BuyPolicyPage() {
                   Connect Wallet to Buy
                 </button>
               ) : !isCorrectChain ? (
-                <button onClick={() => switchChain({ chainId: 42220 })} className="w-full py-4 rounded-full font-medium text-white transition-all flex items-center justify-center gap-2 bg-red-500 hover:bg-red-400 shadow-[0_0_15px_rgba(239,68,68,0.4)]">
-                  Switch to Celo Mainnet
+                <button onClick={() => switchChain({ chainId: BOT_CHAIN.id })} className="w-full py-4 rounded-full font-medium text-white transition-all flex items-center justify-center gap-2 bg-red-500 hover:bg-red-400 shadow-[0_0_15px_rgba(239,68,68,0.4)]">
+                  Switch to BOT Chain
                 </button>
               ) : (
                 <>
@@ -475,7 +476,7 @@ export default function BuyPolicyPage() {
 
             <div className="mt-6 flex flex-col items-center justify-center gap-4 text-sm w-full">
               {(txHash && txType === 'minting') && (
-                <a href={`https://celoscan.io/tx/${txHash}`} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 underline underline-offset-4 flex items-center gap-1">
+                <a href={`${BOT_CHAIN.explorerUrl}/tx/${txHash}`} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 underline underline-offset-4 flex items-center gap-1">
                   {isTxConfirming ? "View Pending Tx on Block Explorer" : "View Confirmed Tx on Block Explorer"}
                 </a>
               )}
@@ -489,7 +490,7 @@ export default function BuyPolicyPage() {
                     📄 View & Download Policy Certificate
                   </a>
                   <a 
-                    href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`Just secured my flight ${flightNumber} on-chain with TravelShield! 🛡️✈️\n\n🔗 Transaction: https://celoscan.io/tx/${txHash}\n\nGet your own autonomous flight insurance at: https://celo-travel.vercel.app\n\n#TravelShield #Celo #Web3 #BuildOnCelo`)}`}
+                    href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`Just secured my flight ${flightNumber} on-chain with TravelShield! 🛡️✈️\n\n🔗 Transaction: ${BOT_CHAIN.explorerUrl}/tx/${txHash}\n\nGet your own autonomous flight insurance at: https://celo-travel.vercel.app\n\n#TravelShield #BOTChain #Web3`)}`}
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="w-full py-3 rounded-full bg-[#1DA1F2]/10 hover:bg-[#1DA1F2]/20 border border-[#1DA1F2]/50 text-[#1DA1F2] font-medium text-center text-sm flex items-center justify-center gap-2 transition-all"
@@ -502,7 +503,7 @@ export default function BuyPolicyPage() {
             </div>
 
             <p className="text-center text-xs text-white/30 mt-4 font-light">
-              Securely processed via Celo Smart Contracts. No intermediary.
+              Securely processed via BOT Chain smart contracts. No intermediary.
             </p>
           </div>
         </motion.div>

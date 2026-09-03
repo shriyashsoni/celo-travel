@@ -9,7 +9,7 @@ dotenv.config();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 async function main() {
-  const provider = new ethers.JsonRpcProvider(process.env.CELO_ALFAJORES_RPC);
+  const provider = new ethers.JsonRpcProvider(process.env.BOT_CHAIN_RPC || "https://rpc.botchain.ai");
   const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
 
   console.log("Deploying contracts with the account:", wallet.address);

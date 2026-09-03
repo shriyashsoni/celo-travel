@@ -38,7 +38,7 @@ export default function WhitepaperPage() {
           
           <div className="liquid-glass rounded-3xl p-8 md:p-12 text-white">
             <p className="text-xl font-light text-white/80 leading-relaxed mb-12">
-              TravelShield is a fully autonomous, parametric travel insurance protocol deployed on the Celo network. This document outlines our decentralized architecture, AI-driven payout mechanics, and ERC-8004 compliance framework.
+              TravelShield is a fully autonomous, parametric travel insurance protocol deployed on BOT Chain. This document outlines our decentralized architecture, AI-driven payout mechanics, and ERC-8004 compliance framework.
             </p>
 
             <h2 className="text-2xl font-heading italic text-white mt-12 mb-6 border-b border-white/10 pb-4">1. The Problem</h2>
@@ -48,13 +48,13 @@ export default function WhitepaperPage() {
 
             <h2 className="text-2xl font-heading italic text-white mt-12 mb-6 border-b border-white/10 pb-4">2. The Parametric Solution</h2>
             <p className="mb-8 text-white/60 font-light leading-relaxed">
-              TravelShield tokenizes insurance policies as ERC-721 NFTs on Celo. The protocol uses an autonomous Node.js chron-job (the "Agent") powered by Groq LLMs (llama3-70b) and the AviationStack API to monitor real-time flight statuses. When a predefined condition is met (e.g., flight delayed {">"} 2 hours), the Agent cryptographically signs and executes an instant cUSD payout directly to the policyholder's wallet.
+              TravelShield tokenizes insurance policies as ERC-721 NFTs on BOT Chain. The protocol uses an autonomous Node.js chron-job (the "Agent") powered by Groq LLMs (llama3-70b) and the AviationStack API to monitor real-time flight statuses. When a predefined condition is met (e.g., flight delayed {">"} 2 hours), the Agent cryptographically signs and executes an instant token payout directly to the policyholder's wallet.
             </p>
 
             <h2 className="text-2xl font-heading italic text-white mt-12 mb-6 border-b border-white/10 pb-4">3. Architecture Stack</h2>
             <ul className="list-disc pl-6 mb-8 text-white/60 font-light space-y-4">
-              <li><strong className="text-white font-medium">Blockchain:</strong> Celo L2 (Ethereum compatible, ultra-fast block times, minimal gas).</li>
-              <li><strong className="text-white font-medium">Currency:</strong> cUSD (Celo Dollar) ensuring stable premium and payout valuation.</li>
+              <li><strong className="text-white font-medium">Blockchain:</strong> BOT Chain (EVM-compatible, ultra-fast block times, minimal gas).</li>
+              <li><strong className="text-white font-medium">Currency:</strong> Project USD token ensuring stable premium and payout valuation.</li>
               <li><strong className="text-white font-medium">Smart Contracts:</strong> OpenZeppelin standard implementations (PolicyNFT, InsurancePool).</li>
               <li><strong className="text-white font-medium">Data Oracle:</strong> AviationStack API for deterministic off-chain flight data.</li>
               <li><strong className="text-white font-medium">Trigger Engine:</strong> Groq API for deterministic AI validation, complying with ERC-8004.</li>

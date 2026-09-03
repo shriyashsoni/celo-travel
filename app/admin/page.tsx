@@ -11,12 +11,12 @@ import { PolicyOverview } from "@/components/policy-overview";
 import { LiveTVLChart } from "@/components/live-tvl-chart";
 import { toast } from "sonner";
 import { DashboardShell } from "@/components/DashboardShell";
+import { BOT_CHAIN } from "@/lib/bot-chain";
 
 // Constants
-const POLICY_NFT_ADDRESS = (process.env.NEXT_PUBLIC_POLICY_NFT_ADDRESS || "0xeBa31f2f2BcEe6089adDE62dd69c1B05f5092e3A").trim() as `0x${string}`;
-const INSURANCE_POOL_ADDRESS = (process.env.NEXT_PUBLIC_INSURANCE_POOL_ADDRESS || "0xc753f9F1f41643eC934E74AA3197E64274088Ec0").trim() as `0x${string}`;
-const CUSD_ADDRESS = "0x765DE816845861e75A25fCA122bb6898B8B1282a" as `0x${string}`;
-const CELOSCAN_API_KEY = process.env.NEXT_PUBLIC_CELOSCAN_API_KEY || "A7PZRDK4NTCBJP99CI5KUVVG84UQVCMT2Z";
+const POLICY_NFT_ADDRESS = (process.env.NEXT_PUBLIC_POLICY_NFT_ADDRESS || "").trim() as `0x${string}`;
+const INSURANCE_POOL_ADDRESS = (process.env.NEXT_PUBLIC_INSURANCE_POOL_ADDRESS || "").trim() as `0x${string}`;
+const CUSD_ADDRESS = BOT_CHAIN.tokenAddress;
 
 // ABIs
 const policyNftAbi = parseAbi([
@@ -73,16 +73,16 @@ export default function OverviewDashboardPage() {
   // Write hooks
   const { writeContract: writeOverviewMint, isPending: isOverviewMintPending } = useWriteContract();
 
-  // Fetch CeloScan History
+  // Fetch BOTScan history
   useEffect(() => {
     if (!mounted) return;
     const fetchHistory = async () => {
       try {
         setLoadingHistory(true);
-        const cusdRes = await fetch(`https://api.celoscan.io/api?module=account&action=tokentx&address=${INSURANCE_POOL_ADDRESS}&page=1&offset=15&sort=desc&apikey=${CELOSCAN_API_KEY}`);
+        const cusdRes = await fetch(`${BOT_CHAIN.explorerApiUrl}?module=account&action=tokentx&address=${INSURANCE_POOL_ADDRESS}&page=1&offset=15&sort=desc`);
         const cusdData = await cusdRes.json();
         
-        const nftRes = await fetch(`https://api.celoscan.io/api?module=account&action=tokennfttx&address=${POLICY_NFT_ADDRESS}&page=1&offset=15&sort=desc&apikey=${CELOSCAN_API_KEY}`);
+        const nftRes = await fetch(`${BOT_CHAIN.explorerApiUrl}?module=account&action=tokennfttx&address=${POLICY_NFT_ADDRESS}&page=1&offset=15&sort=desc`);
         const nftData = await nftRes.json();
 
         let combined: any[] = [];
@@ -106,7 +106,7 @@ export default function OverviewDashboardPage() {
         combined.sort((a, b) => Number(b.timeStamp) - Number(a.timeStamp));
         setTxHistory(combined.slice(0, 8));
       } catch (err) {
-        console.error("Failed to fetch CeloScan history", err);
+        console.error("Failed to fetch BOTScan history", err);
       } finally {
         setLoadingHistory(false);
       }
@@ -169,7 +169,7 @@ export default function OverviewDashboardPage() {
               Overview & Analysis
             </h1>
             <p className="text-sm font-light text-white/60 max-w-xl">
-              Real-time metrics, node status and pool TVL graphs pulled directly from verified Celo smart contracts.
+              Real-time metrics, node status and pool TVL graphs pulled directly from verified BOT Chain smart contracts.
             </p>
           </div>
           <div className="flex flex-col items-start lg:items-end gap-2">
@@ -284,12 +284,12 @@ export default function OverviewDashboardPage() {
                 const tierEl = document.getElementById('overview-mint-tier') as HTMLSelectElement;
                 const t = parseInt(tierEl?.value || "1");
                 if (!formAddress || !formFlight) return;
-                const toastId = toast.loading("Minting policy NFT on Celo...");
+                const toastId = toast.loading("Minting policy NFT on BOT Chain...");
                 writeOverviewMint({
                   address: POLICY_NFT_ADDRESS,
                   abi: policyNftAbi,
                   functionName: 'mintPolicy',
-                  args: [formAddress as `0x${string}`, formFlight, t, Math.floor(Date.now() / 1000) + 86400 * 3]
+                  args: [formAddress as `0x${string}`, formFlight, t, BigInt(Math.floor(Date.now() / 1000) + 86400 * 3)]
                 }, {
                   onSuccess: (txHash) => {
                     toast.dismiss(toastId);
@@ -407,7 +407,7 @@ export default function OverviewDashboardPage() {
                   return (
                     <a 
                       key={`${tx.hash}-${idx}`} 
-                      href={`https://celoscan.io/tx/${tx.hash}`}
+                      href={`${BOT_CHAIN.explorerUrl}/tx/${tx.hash}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center justify-between p-2.5 rounded-xl liquid-glass border border-white/5 hover:bg-white/10 transition-all text-xs group"

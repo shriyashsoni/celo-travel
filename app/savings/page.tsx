@@ -6,9 +6,10 @@ import { Target, TrendingUp, ArrowRight, Wallet, CheckCircle2, Zap, Activity } f
 import { useAccount, useReadContract, useWriteContract } from "wagmi";
 import { parseAbi, formatUnits, parseUnits } from "viem";
 import { toast } from "sonner";
+import { BOT_CHAIN } from "@/lib/bot-chain";
 
-const CUSD_MAINNET_ADDRESS = "0x765DE816845861e75A25fCA122bb6898B8B1282a";
-const VAULT_ADDRESS = "0xc753f9F1f41643eC934E74AA3197E64274088Ec0"; // Deployed InsurancePool acts as our secure yield-generating vault!
+const CUSD_MAINNET_ADDRESS = BOT_CHAIN.tokenAddress;
+const VAULT_ADDRESS = (process.env.NEXT_PUBLIC_INSURANCE_POOL_ADDRESS || "0x0000000000000000000000000000000000000000") as `0x${string}`;
 
 const erc20Abi = parseAbi([
   'function balanceOf(address account) view returns (uint256)',
@@ -67,7 +68,7 @@ export default function SavingsCoachPage() {
       return;
     }
 
-    const toastId = toast.loading("Initiating live Celo Mainnet cUSD deposit...");
+    const toastId = toast.loading("Initiating live BOT Chain USD deposit...");
 
     writeContract({
       address: CUSD_MAINNET_ADDRESS,

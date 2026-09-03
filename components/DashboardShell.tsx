@@ -10,8 +10,9 @@ import { useAccount, useReadContract, useBlockNumber } from "wagmi";
 import { formatUnits, parseAbi } from "viem";
 import { toast } from "sonner";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { BOT_CHAIN } from "@/lib/bot-chain";
 
-const CUSD_ADDRESS = "0x765DE816845861e75A25fCA122bb6898B8B1282a" as `0x${string}`;
+const CUSD_ADDRESS = BOT_CHAIN.tokenAddress;
 
 const erc20Abi = parseAbi([
   'function balanceOf(address account) view returns (uint256)'

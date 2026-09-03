@@ -45,7 +45,7 @@ export default function Home() {
             transition={{ delay: 0.8, duration: 0.8 }}
             className="font-body font-medium text-white/90 text-lg md:text-xl max-w-2xl mb-10 drop-shadow-md"
           >
-            Parametric coverage. Instant payouts in cUSD. Built on Celo, refined by smart contracts. This is travel insurance, wildly reimagined.
+            Parametric coverage. Instant payouts in project stablecoins. Built on BOT Chain, refined by smart contracts. This is travel insurance, wildly reimagined.
           </motion.p>
 
           <motion.div 
@@ -209,7 +209,7 @@ export default function Home() {
               <Globe className="w-5 h-5" />
             </div>
             <h3 className="text-lg font-heading italic text-white">Globally Accessible</h3>
-            <p className="text-white/60 font-body font-light text-sm">Covering thousands of airlines worldwide on the Celo network.</p>
+            <p className="text-white/60 font-body font-light text-sm">Covering thousands of airlines worldwide on BOT Chain.</p>
           </div>
 
           <div className="liquid-glass rounded-2xl p-6 flex flex-col gap-4">
@@ -240,7 +240,7 @@ export default function Home() {
             More than just insurance.
           </h2>
           <p className="font-body font-light text-white/60 text-lg mt-6 max-w-2xl">
-            TravelShield now includes autonomous agents to manage your entire travel finance lifecycle on Celo.
+            TravelShield now includes autonomous agents to manage your entire travel finance lifecycle on BOT Chain.
           </p>
         </div>
 

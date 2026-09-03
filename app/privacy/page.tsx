@@ -26,7 +26,7 @@ export default function PrivacyPolicyPage() {
         <section>
           <h2 className="text-2xl font-heading italic text-white mb-4">2. On-Chain Data Transparency</h2>
           <p>
-            Because TravelShield operates as a decentralized application (dApp) on the Celo blockchain, please be aware that all policies minted and claims settled are permanently recorded on public ledger. Your wallet address and its interactions with our contracts are public by nature.
+            Because TravelShield operates as a decentralized application (dApp) on the BOT Chain blockchain, please be aware that all policies minted and claims settled are permanently recorded on public ledger. Your wallet address and its interactions with our contracts are public by nature.
           </p>
         </section>
 

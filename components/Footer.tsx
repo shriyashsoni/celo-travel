@@ -12,7 +12,7 @@ export default function Footer() {
             TravelShield
           </Link>
           <p className="text-sm max-w-[300px] leading-relaxed">
-            AI-powered, automated flight delay insurance paid out in cUSD on the Celo network. No human approval. Instant settlement.
+            AI-powered, automated flight delay insurance settled on BOT Chain. No human approval. Instant settlement.
           </p>
         </div>
         
@@ -36,7 +36,7 @@ export default function Footer() {
         </div>
       </div>
       <div className="max-w-[1280px] mx-auto mt-12 pt-8 border-t border-white/10 text-xs text-center">
-        <p>© {new Date().getFullYear()} TravelShield. Built for the Celo Onchain Agents Hackathon.</p>
+        <p>© {new Date().getFullYear()} TravelShield. Built for BOT Chain.</p>
       </div>
     </footer>
   );

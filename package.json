@@ -6,7 +6,10 @@
     "build": "next build --webpack",
     "dev": "next dev --webpack",
     "lint": "next lint",
-    "start": "next start"
+    "start": "next start",
+    "wallet:create": "node scripts/create-bot-wallet.js",
+    "deploy:bot": "node scripts/deploy-all.js",
+    "deploy:bot:resume": "node scripts/resume-bot-deployment.js"
   },
   "dependencies": {
     "@base-org/account": "^2.5.6",

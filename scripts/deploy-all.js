@@ -1,6 +1,7 @@
 import { ethers } from "ethers";
 import * as dotenv from "dotenv";
 dotenv.config({ path: ".env.deploy" });
+dotenv.config({ path: ".env.local" });
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -10,10 +11,14 @@ dotenv.config();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 async function main() {
-  const provider = new ethers.JsonRpcProvider(process.env.CELO_ALFAJORES_RPC); // 11142220 Celo Sepolia
+  const rpcUrl = process.env.BOT_CHAIN_RPC || "https://rpc.botchain.ai";
+  if (!process.env.PRIVATE_KEY) throw new Error("PRIVATE_KEY is required for deployment");
+  const provider = new ethers.JsonRpcProvider(rpcUrl);
+  const network = await provider.getNetwork();
+  if (Number(network.chainId) !== 677) throw new Error(`Expected Bot Chain (677), got ${network.chainId}`);
   const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
 
-  console.log("Starting full deployment to Celo Sepolia...");
+  console.log("Starting full deployment to Bot Chain...");
   console.log("Deploying contracts with the account:", wallet.address);
 
   const readArtifact = (contractName) => {
@@ -28,7 +33,7 @@ async function main() {
   const cusd = await MockFactory.deploy("Test cUSD", "tcUSD");
   await cusd.waitForDeployment();
   const cusdAddress = await cusd.getAddress();
-  console.log("Mock cUSD deployed to:", cusdAddress);
+  console.log("Mock BOT USD deployed to:", cusdAddress);
 
   console.log("Minting 10,000 tcUSD to deployer...");
   const mintTx = await cusd.mint(wallet.address, ethers.parseUnits("10000", 18));
@@ -80,15 +85,23 @@ async function main() {
 }
 
 function updateFrontendFiles(cusdAddress, policyNFTAddress, agentRegistryAddress, insurancePoolAddress) {
-  const envPath = path.join(__dirname, "../.env.deploy");
-  if (fs.existsSync(envPath)) {
-    let envData = fs.readFileSync(envPath, "utf8");
-    envData = envData.replace(/NEXT_PUBLIC_POLICY_NFT_ADDRESS=.*/, `NEXT_PUBLIC_POLICY_NFT_ADDRESS=${policyNFTAddress}`);
-    envData = envData.replace(/NEXT_PUBLIC_AGENT_REGISTRY_ADDRESS=.*/, `NEXT_PUBLIC_AGENT_REGISTRY_ADDRESS=${agentRegistryAddress}`);
-    envData = envData.replace(/NEXT_PUBLIC_INSURANCE_POOL_ADDRESS=.*/, `NEXT_PUBLIC_INSURANCE_POOL_ADDRESS=${insurancePoolAddress}`);
-    fs.writeFileSync(envPath, envData);
-    console.log(".env.deploy updated!");
+  const envPath = path.join(__dirname, "../.env.local");
+  let envData = fs.existsSync(envPath) ? fs.readFileSync(envPath, "utf8") : "";
+  const values = {
+    NEXT_PUBLIC_BOT_CHAIN_RPC: "https://rpc.botchain.ai",
+    NEXT_PUBLIC_BOT_CHAIN_EXPLORER: "https://scan.botchain.ai",
+    NEXT_PUBLIC_CUSD_ADDRESS: cusdAddress,
+    NEXT_PUBLIC_POLICY_NFT_ADDRESS: policyNFTAddress,
+    NEXT_PUBLIC_AGENT_REGISTRY_ADDRESS: agentRegistryAddress,
+    NEXT_PUBLIC_INSURANCE_POOL_ADDRESS: insurancePoolAddress,
+  };
+  for (const [key, value] of Object.entries(values)) {
+    const line = `${key}=${value}`;
+    const pattern = new RegExp(`^${key}=.*$`, "m");
+    envData = pattern.test(envData) ? envData.replace(pattern, line) : `${envData}${envData.endsWith("\n") || !envData ? "" : "\n"}${line}\n`;
   }
+  fs.writeFileSync(envPath, envData);
+  console.log(".env.local updated with Bot Chain deployment addresses!");
 
   const pagePath = path.join(__dirname, "../app/buy-policy/page.tsx");
   if (fs.existsSync(pagePath)) {
