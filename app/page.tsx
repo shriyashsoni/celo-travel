@@ -386,12 +386,62 @@ export default function Home() {
             </Link>
           </div>
 
-          <footer className="w-full mt-32 pt-8 border-t border-white/10 flex flex-col sm:flex-row justify-between items-center gap-4">
-            <div className="text-white/40 text-xs font-body">© 2026 TravelShield Platform</div>
+          {/* Ecosystem Partner Showcase */}
+          <div className="w-full mt-24 p-6 sm:p-8 rounded-2xl liquid-glass border border-white/10 flex flex-col md:flex-row items-center justify-between gap-6 text-left">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-xl overflow-hidden liquid-glass border border-emerald-500/30 p-1.5 flex items-center justify-center shrink-0 shadow-[0_0_20px_rgba(16,185,129,0.15)] bg-black/60">
+                <img 
+                  src="/botchain-logo.jpeg" 
+                  alt="BOT Chain Logo" 
+                  className="w-full h-full object-contain rounded-lg"
+                />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] uppercase font-mono tracking-widest px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-semibold">
+                    Ecosystem Partner
+                  </span>
+                </div>
+                <h3 className="text-xl font-heading italic text-white tracking-tight mt-1">
+                  BOT Chain
+                </h3>
+                <p className="text-xs text-white/60 font-light mt-0.5 max-w-sm">
+                  Autonomous AI agent execution layer providing sub-second settlement and micro-gas transactions.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
+              <a 
+                href="https://botchain.ai" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl liquid-glass-strong hover:bg-white/10 text-xs font-mono text-white/90 hover:text-white transition-all border border-white/10 hover:border-white/20 group"
+              >
+                <span>BOT Chain official website</span>
+                <ArrowUpRight size={14} className="opacity-60 group-hover:opacity-100 transition-opacity" />
+              </a>
+              <a 
+                href="https://scan.botchain.ai" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl liquid-glass-strong hover:bg-white/10 text-xs font-mono text-white/90 hover:text-white transition-all border border-white/10 hover:border-white/20 group"
+              >
+                <span>BOT Chain Explorer</span>
+                <ArrowUpRight size={14} className="opacity-60 group-hover:opacity-100 transition-opacity" />
+              </a>
+            </div>
+          </div>
+
+          <footer className="w-full mt-10 pt-8 border-t border-white/10 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div className="text-white/40 text-xs font-body">
+              © {new Date().getFullYear()} TravelShield Platform. Powered by BOT Chain.
+            </div>
             <div className="flex gap-6">
               <Link href="/privacy" className="text-white/40 text-xs font-body hover:text-white/80 transition-colors">Privacy</Link>
               <Link href="/terms" className="text-white/40 text-xs font-body hover:text-white/80 transition-colors">Terms</Link>
-              <Link href="#" className="text-white/40 text-xs font-body hover:text-white/80 transition-colors">Contact</Link>
+              <Link href="/whitepaper" className="text-white/40 text-xs font-body hover:text-white/80 transition-colors">Whitepaper</Link>
+              <Link href="/docs" className="text-white/40 text-xs font-body hover:text-white/80 transition-colors">Docs</Link>
             </div>
           </footer>
         </div>
