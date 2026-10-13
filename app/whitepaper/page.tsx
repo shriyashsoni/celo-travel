@@ -4,6 +4,8 @@ import React from "react";
 import { motion } from "framer-motion";
 import { FileText, Download } from "lucide-react";
 
+import Footer from "@/components/Footer";
+
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
   visible: (i: number) => ({
@@ -67,6 +69,7 @@ export default function WhitepaperPage() {
           </div>
         </motion.div>
       </main>
+      <Footer />
     </div>
   );
 }
